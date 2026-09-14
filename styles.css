@@ -1,0 +1,3974 @@
+/* ============================================================
+   Андрей Варнавский — инженер прямого эфира
+   Дизайн-система. Mobile-first: база — телефон, дальше min-width.
+   ============================================================ */
+
+:root {
+  /* --- грунт --- */
+  --void: #05030c;
+  --ground: #080614;
+  --panel: #0d0a1c;
+  --panel-2: #131029;
+  --raise: #191537;
+  --glass: rgba(255, 255, 255, 0.028);
+  --glass-2: rgba(255, 255, 255, 0.055);
+
+  /* --- линии. hot = 3:1, для границ, несущих состояние --- */
+  --line: rgba(150, 130, 255, 0.14);
+  --line-mid: rgba(163, 143, 255, 0.28);
+  --line-hot: rgba(190, 164, 255, 0.62);
+
+  /* --- текст. Проверено по контрасту к --void --- */
+  --text: #f4f2ff;      /* 18.4:1 */
+  --text-2: #cdc8e6;    /* 12.1:1 */
+  --muted: #a09aba;     /* 7.6:1  */
+  --faint: #8f89ab;     /* 5.9:1  — нижняя граница для мелкого текста */
+
+  /* --- спектр --- */
+  --violet: #a855f7;
+  --indigo: #6366f1;
+  --blue: #3b82f6;
+  --cyan: #22d3ee;
+  --magenta: #e879f9;
+
+  /* --- эфирная сигнализация --- */
+  --tally-on: #ff4d4d;   /* PROGRAM — в эфире */
+  --tally-pre: #3ddc97;  /* PREVIEW — готово к выдаче */
+  --warn: #ffc44a;
+
+  --focus: #c4a6ff;
+
+  /* --- типографика --- */
+  --display: "Unbounded", "Segoe UI", system-ui, sans-serif;
+  --sans: "Onest", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+
+  /* Пол типографики. Ниже 12px на мобильном не опускаемся нигде. */
+  --label: 12px;
+  --label-lg: 13px;
+  --fs-body: 16px;
+  --fs-lead: clamp(17px, 1.1vw + 14px, 20px);
+  --fs-h3: clamp(21px, 1.4vw + 17px, 27px);
+  --fs-h2: clamp(29px, 4.2vw + 14px, 56px);
+  --fs-hero: clamp(40px, 9vw + 6px, 104px);
+
+  /* --- сетка --- */
+  --shell: min(1320px, 100vw - clamp(20px, 5vw, 72px));
+  --radius: 18px;
+  --radius-sm: 12px;
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ============================================================
+   База
+   ============================================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 88px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--void);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: var(--fs-body);
+  line-height: 1.62;
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+img,
+video {
+  height: auto;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 700;
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+p {
+  margin: 0;
+}
+
+::selection {
+  background: rgba(168, 85, 247, 0.35);
+  color: #fff;
+}
+
+/* ============================================================
+   Доступность: фокус, тач-цели, пропуск навигации
+   ============================================================ */
+
+/* Одно правило нулевой специфичности закрывает каждый интерактивный элемент.
+   :where() не поднимает вес — точечные стили ниже остаются рабочими. */
+:where(a, button, [tabindex], summary, input, textarea, select, video):focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+button,
+[role="tab"],
+[role="button"],
+.project-card,
+summary {
+  cursor: pointer;
+}
+
+/* Ни одна цель нажатия не уходит ниже минимума WCAG 2.2 (24×24 CSS px). */
+a,
+button,
+[role="tab"] {
+  min-height: 24px;
+}
+
+.skip-link {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 999;
+  transform: translateY(-160%);
+  padding: 12px 20px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  background: var(--raise);
+  border: 1px solid var(--line-hot);
+  border-radius: 10px;
+  font-family: var(--mono);
+  font-size: var(--label-lg);
+  transition: transform 0.2s var(--ease);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================================
+   Утилиты
+   ============================================================ */
+
+.shell {
+  width: var(--shell);
+  margin-inline: auto;
+}
+
+.label {
+  font-family: var(--mono);
+  font-size: var(--label);
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.label-hot {
+  color: var(--violet);
+}
+
+.section {
+  position: relative;
+  padding-block: clamp(64px, 9vw, 132px);
+}
+
+/* Тяжёлые секции не считаются, пока не подъехали к экрану. */
+.section-heavy {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 900px;
+}
+
+.section-head {
+  display: grid;
+  gap: 18px;
+  margin-bottom: clamp(32px, 4vw, 56px);
+}
+
+.section-index {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--mono);
+  font-size: var(--label);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.section-index b {
+  color: var(--violet);
+  font-weight: 700;
+}
+
+.section-index i {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--line-mid), transparent);
+}
+
+.section-head h2 {
+  font-size: var(--fs-h2);
+}
+
+.section-head .lead {
+  color: var(--text-2);
+  font-size: var(--fs-lead);
+  max-width: 58ch;
+}
+
+/* --- появление по скроллу: нативно, без единой строки JS --- */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: reveal-in linear both;
+      animation-timeline: view();
+      animation-range: entry 4% cover 26%;
+    }
+  }
+}
+
+@keyframes reveal-in {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* --- переходы состояний через View Transitions --- */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.3s;
+}
+
+/* ============================================================
+   Фон: генеративный сигнальный слой
+   ============================================================ */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(90ch 60ch at 78% -10%, rgba(99, 102, 241, 0.22), transparent 62%),
+    radial-gradient(70ch 50ch at 8% 12%, rgba(168, 85, 247, 0.16), transparent 60%),
+    radial-gradient(80ch 60ch at 50% 108%, rgba(34, 211, 238, 0.1), transparent 64%),
+    var(--void);
+}
+
+.grid-lines {
+  position: absolute;
+  inset: 0;
+  opacity: 0.35;
+  background-image:
+    linear-gradient(rgba(150, 130, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(150, 130, 255, 0.06) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(110% 80% at 50% 20%, #000 10%, transparent 72%);
+}
+
+/* ============================================================
+   Шапка
+   ============================================================ */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  background: rgba(6, 4, 15, 0.76);
+  backdrop-filter: blur(18px) saturate(1.3);
+  border-bottom: 1px solid var(--line);
+}
+
+.topbar-inner {
+  width: var(--shell);
+  margin-inline: auto;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  min-height: 44px;
+  padding-right: 8px;
+  margin-right: auto;
+}
+
+.brand-mark {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--violet), var(--blue));
+  font-family: var(--display);
+  font-size: 14px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.03em;
+}
+
+.brand-text {
+  display: grid;
+  gap: 2px;
+}
+
+.brand-text strong {
+  font-family: var(--display);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.brand-text span {
+  font-family: var(--mono);
+  font-size: var(--label);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.topbar nav {
+  display: none;
+}
+
+.topbar nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 0 13px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-2);
+  transition: color 0.2s var(--ease), background 0.2s var(--ease);
+}
+
+.topbar nav a span {
+  font-family: var(--mono);
+  font-size: var(--label);
+  font-weight: 500;
+  color: var(--violet);
+}
+
+.topbar nav a:hover {
+  color: #fff;
+  background: var(--glass-2);
+}
+
+.availability {
+  display: none;
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 0 15px;
+  border: 1px solid var(--line-mid);
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: var(--label);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  transition: border-color 0.2s var(--ease), color 0.2s var(--ease);
+}
+
+.availability:hover {
+  border-color: var(--line-hot);
+  color: #fff;
+}
+
+.tally {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--tally-pre);
+  box-shadow: 0 0 0 3px rgba(61, 220, 151, 0.18);
+  flex: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .tally {
+    animation: tally-pulse 2.4s ease-in-out infinite;
+  }
+}
+
+@keyframes tally-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 3px rgba(61, 220, 151, 0.18);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(61, 220, 151, 0.05);
+  }
+}
+
+.menu-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 0 15px;
+  background: var(--glass);
+  border: 1px solid var(--line-mid);
+  border-radius: 12px;
+  font-family: var(--mono);
+  font-size: var(--label);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+
+.menu-toggle i {
+  display: grid;
+  gap: 4px;
+  width: 16px;
+}
+
+.menu-toggle i span {
+  height: 1.5px;
+  background: currentColor;
+  border-radius: 2px;
+  transition: transform 0.25s var(--ease), opacity 0.2s var(--ease);
+}
+
+.menu-toggle[aria-expanded="true"] i span:first-child {
+  transform: translateY(2.75px) rotate(45deg);
+}
+
+.menu-toggle[aria-expanded="true"] i span:last-child {
+  transform: translateY(-2.75px) rotate(-45deg);
+}
+
+/* --- мобильное меню --- */
+.mobile-nav {
+  position: fixed;
+  inset: 64px 0 auto;
+  z-index: 55;
+  padding: 20px clamp(20px, 5vw, 40px) 28px;
+  background: rgba(8, 6, 20, 0.97);
+  backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--line-mid);
+  /* visibility: hidden убирает ссылки и из таб-порядка, не только с глаз */
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-12px);
+  transition: opacity 0.24s var(--ease), transform 0.24s var(--ease), visibility 0.24s;
+}
+
+.mobile-nav.open {
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+}
+
+.mobile-nav nav {
+  display: grid;
+  gap: 4px;
+}
+
+.mobile-nav nav a {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 56px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  transition: background 0.2s var(--ease), border-color 0.2s var(--ease);
+}
+
+.mobile-nav nav a:hover {
+  background: var(--glass);
+  border-color: var(--line);
+}
+
+.mobile-nav nav a span {
+  font-family: var(--mono);
+  font-size: var(--label);
+  color: var(--violet);
+}
+
+.mobile-nav nav a strong {
+  flex: 1;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.mobile-nav nav a i {
+  color: var(--faint);
+  font-style: normal;
+}
+
+.mobile-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 52px;
+  margin-top: 14px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--violet), var(--blue));
+  font-weight: 600;
+  color: #fff;
+}
+
+/* ============================================================
+   Герой
+   ============================================================ */
+
+.hero {
+  position: relative;
+  padding-block: clamp(40px, 6vw, 76px) clamp(56px, 7vw, 96px);
+}
+
+.hero-inner {
+  display: grid;
+  gap: clamp(32px, 5vw, 56px);
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  padding: 0 15px;
+  width: fit-content;
+  border: 1px solid var(--line-mid);
+  border-radius: 999px;
+  background: var(--glass);
+  font-family: var(--mono);
+  font-size: var(--label);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+
+.hero h1 {
+  margin-top: 22px;
+  font-size: var(--fs-hero);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 0.94;
+}
+
+.hero h1 em {
+  font-style: normal;
+  background: linear-gradient(100deg, var(--cyan), var(--violet) 52%, var(--magenta));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  /* если background-clip не сработает, текст останется читаемым */
+  color: var(--violet);
+}
+
+.hero-lead {
+  margin-top: 24px;
+  max-width: 52ch;
+  font-size: var(--fs-lead);
+  color: var(--text-2);
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 24px;
+  border-radius: 13px;
+  border: 1px solid transparent;
+  font-size: 15px;
+  font-weight: 600;
+  transition: transform 0.22s var(--ease), box-shadow 0.22s var(--ease),
+    border-color 0.22s var(--ease), background 0.22s var(--ease);
+}
+
+.btn svg {
+  width: 17px;
+  height: 17px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--violet), var(--blue));
+  color: #fff;
+  box-shadow: 0 14px 38px rgba(99, 102, 241, 0.32);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 48px rgba(99, 102, 241, 0.45);
+}
+
+.btn-ghost {
+  background: var(--glass);
+  border-color: var(--line-mid);
+  color: var(--text);
+}
+
+.btn-ghost:hover {
+  border-color: var(--line-hot);
+  background: var(--glass-2);
+  transform: translateY(-2px);
+}
+
+.hero-socials {
+  display: flex;
+  gap: 10px;
+  margin-top: 26px;
+}
+
+.hero-socials a {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: 1px solid var(--line-mid);
+  border-radius: 12px;
+  background: var(--glass);
+  color: var(--text-2);
+  transition: color 0.2s var(--ease), border-color 0.2s var(--ease), transform 0.2s var(--ease);
+}
+
+.hero-socials a:hover {
+  color: #fff;
+  border-color: var(--line-hot);
+  transform: translateY(-2px);
+}
+
+.hero-socials svg {
+  width: 19px;
+  height: 19px;
+}
+
+/* --- визуальная половина героя --- */
+.hero-visual {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  border-radius: clamp(20px, 4vw, 30px);
+  overflow: hidden;
+  border: 1px solid var(--line-mid);
+  background:
+    radial-gradient(60% 50% at 60% 22%, rgba(99, 102, 241, 0.28), transparent 68%),
+    linear-gradient(180deg, var(--panel-2), var(--void));
+}
+
+.hero-portrait {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 12%;
+  mask-image: linear-gradient(180deg, #000 62%, transparent 97%);
+}
+
+.hero-visual::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 42%, rgba(5, 3, 12, 0.88) 92%);
+  pointer-events: none;
+}
+
+.hero-stats {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 14px;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.stat-card {
+  padding: 12px 10px;
+  border-radius: 14px;
+  border: 1px solid var(--line-mid);
+  background: rgba(11, 8, 24, 0.82);
+  backdrop-filter: blur(14px);
+  text-align: center;
+}
+
+.stat-card b {
+  display: block;
+  font-family: var(--display);
+  font-size: clamp(20px, 4.6vw, 28px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  background: linear-gradient(120deg, var(--cyan), var(--violet));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--cyan);
+}
+
+.stat-card span {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--mono);
+  font-size: var(--label);
+  line-height: 1.3;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.hero-chip {
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 13px;
+  border-radius: 12px;
+  border: 1px solid var(--line-hot);
+  background: rgba(11, 8, 24, 0.88);
+  backdrop-filter: blur(14px);
+  font-family: var(--mono);
+  font-size: var(--label);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.hero-chip-live {
+  top: 14px;
+  left: 14px;
+  border-color: rgba(255, 77, 77, 0.55);
+}
+
+.hero-chip-live .tally {
+  background: var(--tally-on);
+  box-shadow: 0 0 0 3px rgba(255, 77, 77, 0.2);
+  animation-name: tally-live;
+}
+
+@keyframes tally-live {
+  0%,
+  100% {
+    box-shadow: 0 0 0 3px rgba(255, 77, 77, 0.22);
+  }
+  50% {
+    box-shadow: 0 0 0 7px rgba(255, 77, 77, 0.04);
+  }
+}
+
+.hero-chip-rate {
+  top: 14px;
+  right: 14px;
+}
+
+/* ============================================================
+   Бегущая строка технологий
+   ============================================================ */
+
+.ticker {
+  position: relative;
+  padding-block: 18px;
+  border-block: 1px solid var(--line);
+  background: rgba(9, 7, 20, 0.6);
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+
+.ticker-track {
+  display: flex;
+  width: max-content;
+}
+
+.ticker-group {
+  display: flex;
+  gap: 44px;
+  padding-right: 44px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ticker-track {
+    animation: ticker-run 38s linear infinite;
+  }
+  .ticker:hover .ticker-track {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes ticker-run {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.ticker-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  font-family: var(--mono);
+  font-size: var(--label-lg);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.ticker-item img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  opacity: 0.8;
+}
+
+.ticker-item i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--violet);
+  flex: none;
+}
+
+/* ============================================================
+   Профиль
+   ============================================================ */
+
+.profile-grid {
+  display: grid;
+  gap: clamp(24px, 3.5vw, 44px);
+}
+
+.card {
+  position: relative;
+  padding: clamp(22px, 3vw, 34px);
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  overflow: hidden;
+}
+
+/* глянцевый блик поверху — свет из референсов, не декоративный градиент */
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(190, 170, 255, 0.7), transparent);
+}
+
+.profile-copy p {
+  color: var(--text-2);
+  max-width: 60ch;
+}
+
+.profile-copy p + p {
+  margin-top: 16px;
+}
+
+.profile-facts {
+  display: grid;
+  gap: 1px;
+  margin-top: 28px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.profile-fact {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 14px 16px;
+  background: var(--panel);
+}
+
+.profile-fact svg {
+  width: 18px;
+  height: 18px;
+  color: var(--violet);
+  flex: none;
+}
+
+.profile-fact div {
+  min-width: 0;
+}
+
+.profile-fact small {
+  display: block;
+  font-family: var(--mono);
+  font-size: var(--label);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.profile-fact strong {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.profile-fact .live {
+  color: var(--tally-pre);
+}
+
+.profile-visual {
+  position: relative;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  aspect-ratio: 3 / 4;
+  background: linear-gradient(180deg, var(--panel-2), var(--void));
+}
+
+.profile-visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-signals {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  right: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.profile-signals span {
+  padding: 6px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--line-mid);
+  background: rgba(10, 7, 22, 0.85);
+  backdrop-filter: blur(10px);
+  font-family: var(--mono);
+  font-size: var(--label);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+
+/* ============================================================
+   Компетенции — четыре контура
+   ============================================================ */
+
+.contours {
+  display: grid;
+  gap: 14px;
+}
+
+.contour {
+  position: relative;
+  display: grid;
+  gap: 18px;
+  padding: clamp(20px, 3vw, 30px);
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  overflow: hidden;
+  transition: border-color 0.3s var(--ease), transform 0.3s var(--ease);
+}
+
+.contour:hover {
+  border-color: var(--line-hot);
+  transform: translateY(-3px);
+}
+
+.contour-accent {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+}
+
+.contour-live .contour-accent {
+  background: linear-gradient(180deg, var(--tally-on), transparent);
+}
+.contour-graphics .contour-accent {
+  background: linear-gradient(180deg, var(--violet), transparent);
+}
+.contour-sound .contour-accent {
+  background: linear-gradient(180deg, var(--tally-pre), transparent);
+}
+.contour-automation .contour-accent {
+  background: linear-gradient(180deg, var(--cyan), transparent);
+}
+
+.contour-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.contour-num {
+  font-family: var(--mono);
+  font-size: var(--label-lg);
+  font-weight: 700;
+  color: var(--violet);
+}
+
+.contour h3 {
+  font-size: var(--fs-h3);
+}
+
+.contour-meta {
+  font-family: var(--mono);
+  font-size: var(--label);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.contour p {
+  color: var(--text-2);
+  max-width: 54ch;
+}
+
+.contour-media {
+  position: relative;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  aspect-ratio: 16 / 10;
+}
+
+.contour-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s var(--ease);
+}
+
+.contour:hover .contour-media img {
+  transform: scale(1.04);
+}
+
+/* индикатор уровня в контуре звука */
+.level-meter {
+  width: 100%;
+  height: 76px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  background: rgba(4, 3, 10, 0.7);
+  padding: 8px;
+}
+
+/* ============================================================
+   Эфирная графика
+   ============================================================ */
+
+.studio {
+  display: grid;
+  gap: clamp(18px, 2.6vw, 28px);
+}
+
+.case-player {
+  position: relative;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--line-mid);
+  background: #04030a;
+}
+
+.case-player video {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: #04030a;
+}
+
+.case-player-start {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 20px;
+  background: linear-gradient(180deg, rgba(5, 3, 12, 0.25), rgba(5, 3, 12, 0.72));
+  border: 0;
+  color: var(--text);
+  transition: background 0.3s var(--ease);
+}
+
+.case-player-start:hover {
+  background: linear-gradient(180deg, rgba(5, 3, 12, 0.15), rgba(5, 3, 12, 0.62));
+}
+
+.case-player-icon {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  flex: none;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--violet), var(--blue));
+  box-shadow: 0 12px 34px rgba(99, 102, 241, 0.45);
+  transition: transform 0.3s var(--ease);
+}
+
+.case-player-icon svg {
+  width: 26px;
+  height: 26px;
+  margin-left: 3px;
+  color: #fff;
+}
+
+.case-player-start:hover .case-player-icon {
+  transform: scale(1.08);
+}
+
+.case-player-label {
+  text-align: left;
+}
+
+.case-player-label strong {
+  display: block;
+  font-family: var(--display);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.case-player-label small {
+  display: block;
+  margin-top: 3px;
+  font-family: var(--mono);
+  font-size: var(--label);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.case-player-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 15px;
+  border-top: 1px solid var(--line);
+  background: rgba(9, 6, 18, 0.9);
+  font-family: var(--mono);
+  font-size: var(--label);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.case-player-bar span {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.case-player-bar b {
+  color: var(--text-2);
+  font-weight: 500;
+}
+
+/* --- вкладки кейсов --- */
+.case-tabs {
+  display: grid;
+  gap: 8px;
+}
+
+.case-tab {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 64px;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  background: var(--panel);
+  text-align: left;
+  transition: border-color 0.24s var(--ease), background 0.24s var(--ease),
+    transform 0.24s var(--ease);
+}
+
+.case-tab:hover {
+  border-color: var(--line-mid);
+  transform: translateX(3px);
+}
+
+/* активная вкладка = PROGRAM: граница даёт 3:1, состояние читается не только цветом */
+.case-tab[aria-selected="true"] {
+  border-color: var(--line-hot);
+  background: linear-gradient(100deg, rgba(168, 85, 247, 0.16), rgba(59, 130, 246, 0.07));
+}
+
+.case-tab-num {
+  font-family: var(--mono);
+  font-size: var(--label-lg);
+  font-weight: 700;
+  color: var(--faint);
+  flex: none;
+}
+
+.case-tab[aria-selected="true"] .case-tab-num {
+  color: var(--violet);
+}
+
+.case-tab-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.case-tab-body small {
+  display: block;
+  font-family: var(--mono);
+  font-size: var(--label);
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.case-tab-body strong {
+  display: block;
+  margin-top: 3px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.case-tab-state {
+  font-family: var(--mono);
+  font-size: var(--label);
+  letter-spacing: 0.1em;
+  color: var(--faint);
+  flex: none;
+}
+
+.case-tab[aria-selected="true"] .case-tab-state {
+  color: var(--tally-on);
+}
+
+.case-copy {
+  padding: clamp(20px, 3vw, 28px);
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+}
+
+.case-copy h3 {
+  margin-top: 10px;
+  font-size: var(--fs-h3);
+}
+
+.case-copy p {
+  margin-top: 12px;
+  color: var(--text-2);
+  max-width: 56ch;
+}
+
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 18px;
+}
+
+.tag-row span {
+  padding: 7px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line-mid);
+  background: var(--glass);
+  font-family: var(--mono);
+  font-size: var(--label);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+
+/* ============================================================
+   Дипломный проект
+   ============================================================ */
+
+.thesis-quote {
+  padding: clamp(20px, 3vw, 30px);
+  border-left: 2px solid var(--violet);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: linear-gradient(90deg, rgba(168, 85, 247, 0.08), transparent);
+  font-size: var(--fs-lead);
+  color: var(--text-2);
+  max-width: 74ch;
+}
+
+.thesis-map {
+  display: grid;
+  gap: 10px;
+  margin-block: clamp(28px, 4vw, 44px);
+}
+
+/* Узлы схемы — та же семантика вкладок, что и панель ниже:
+   выбран ровно один из шести, и он управляет содержимым. */
+.map-node {
+  position: relative;
+  display: grid;
+  gap: 5px;
+  padding: 16px;
+  min-height: 88px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  background: var(--panel);
+  text-align: left;
+  transition: border-color 0.24s var(--ease), background 0.24s var(--ease),
+    transform 0.24s var(--ease);
+}
+
+.map-node:hover {
+  border-color: var(--line-mid);
+  transform: translateY(-2px);
+}
+
+.map-node[aria-selected="true"] {
+  border-color: var(--line-hot);
+  background: linear-gradient(150deg, rgba(168, 85, 247, 0.17), rgba(59, 130, 246, 0.06));
+}
+
+.map-node-num {
+  font-family: var(--mono);
+  font-size: var(--label);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--faint);
+}
+
+.map-node[aria-selected="true"] .map-node-num {
+  color: var(--violet);
+}
+
+.map-node strong {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.map-node small {
+  font-family: var(--mono);
+  font-size: var(--label);
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.map-out {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 77, 77, 0.4);
+  background: linear-gradient(100deg, rgba(255, 77, 77, 0.12), transparent);
+}
+
+.map-out div {
+  min-width: 0;
+}
+
+.map-out small {
+  display: block;
+  font-family: var(--mono);
+  font-size: var(--label);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.map-out strong {
+  font-family: var(--display);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.map-out span {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--mono);
+  font-size: var(--label);
+  letter-spacing: 0.12em;
+  color: var(--tally-on);
+  white-space: nowrap;
+}
+
+.map-out .tally {
+  background: var(--tally-on);
+  box-shadow: 0 0 0 3px rgba(255, 77, 77, 0.2);
+  animation-name: tally-live;
+}
+
+.stage-panel {
+  padding: clamp(22px, 3vw, 34px);
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+}
+
+.stage-panel h3 {
+  margin-top: 10px;
+  font-size: var(--fs-h3);
+}
+
+.stage-panel > p {
+  margin-top: 14px;
+  color: var(--text-2);
+  max-width: 62ch;
+}
+
+.stage-points {
+  display: grid;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.stage-point {
+  display: flex;
+  gap: 13px;
+  padding: 15px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  background: rgba(8, 6, 18, 0.6);
+}
+
+.stage-point b {
+  font-family: var(--mono);
+  font-size: var(--label-lg);
+  font-weight: 700;
+  color: var(--violet);
+  flex: none;
+}
+
+.stage-point p {
+  color: var(--text-2);
+  font-size: 15px;
+}
+
+.stage-effect {
+  display: grid;
+  gap: 6px;
+  margin-top: 22px;
+  padding: 16px 18px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(61, 220, 151, 0.32);
+  background: linear-gradient(100deg, rgba(61, 220, 151, 0.1), transparent);
+}
+
+.stage-effect small {
+  font-family: var(--mono);
+  font-size: var(--label);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--tally-pre);
+}
+
+.stage-effect strong {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.figure-grid {
+  display: grid;
+  gap: 12px;
+  margin-top: 26px;
+}
+
+.figure-btn {
+  position: relative;
+  display: grid;
+  gap: 0;
+  padding: 0;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  background: var(--panel);
+  overflow: hidden;
+  text-align: left;
+  transition: border-color 0.24s var(--ease), transform 0.24s var(--ease);
+}
+
+.figure-btn:hover {
+  border-color: var(--line-hot);
+  transform: translateY(-3px);
+}
+
+.figure-btn img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.figure-btn figcaption,
+.figure-cap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  border-top: 1px solid var(--line);
+}
+
+.figure-cap b {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.figure-cap small {
+  font-family: var(--mono);
+  font-size: var(--label);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--violet);
+  white-space: nowrap;
+}
+
+/* --- нативный диалог --- */
+.figure-dialog {
+  width: min(1100px, calc(100vw - 24px));
+  max-width: none;
+  max-height: calc(100vh - 24px);
+  padding: 0;
+  border: 1px solid var(--line-hot);
+  border-radius: var(--radius);
+  background: var(--panel);
+  color: var(--text);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.figure-dialog::backdrop {
+  background: rgba(4, 2, 10, 0.82);
+  backdrop-filter: blur(8px);
+}
+
+.figure-dialog-inner {
+  position: relative;
+}
+
+.figure-dialog-close {
+  position: sticky;
+  top: 12px;
+  float: right;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+  margin: 12px 12px 0 0;
+  padding: 0 16px;
+  border-radius: 10px;
+  border: 1px solid var(--line-hot);
+  background: rgba(10, 7, 22, 0.92);
+  backdrop-filter: blur(10px);
+  font-family: var(--mono);
+  font-size: var(--label);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.figure-dialog img {
+  width: 100%;
+  height: auto;
+}
+
+.figure-dialog figure {
+  margin: 0;
+}
+
+.figure-dialog figcaption {
+  display: flex;
+  gap: 14px;
+  padding: 18px clamp(16px, 3vw, 26px) clamp(20px, 3vw, 26px);
+  border-top: 1px solid var(--line);
+}
+
+.figure-dialog-num {
+  font-family: var(--mono);
+  font-size: var(--label-lg);
+  font-weight: 700;
+  color: var(--violet);
+  flex: none;
+}
+
+.figure-dialog figcaption strong {
+  display: block;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.figure-dialog figcaption p {
+  margin-top: 6px;
+  color: var(--text-2);
+  font-size: 15px;
+  max-width: 62ch;
+}
+
+/* ============================================================
+   Проекты — мультивьюер
+   ============================================================ */
+
+.multiview {
+  display: grid;
+  gap: 12px;
+}
+
+.project-card {
+  position: relative;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  transition: border-color 0.35s var(--ease), box-shadow 0.45s var(--ease), transform 0.45s var(--ease);
+}
+
+.project-card:hover {
+  border-color: var(--line-hot);
+  transform: translateY(-3px);
+}
+
+.project-card figure {
+  margin: 0;
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+
+.project-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.9s var(--ease);
+}
+
+.project-card:hover img {
+  transform: scale(1.05);
+}
+
+.project-src {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--line-mid);
+  background: rgba(6, 4, 14, 0.86);
+  backdrop-filter: blur(8px);
+  font-family: var(--mono);
+  font-size: var(--label);
+  letter-spacing: 0.1em;
+  color: var(--text-2);
+  transition: background-color 0.3s var(--ease), border-color 0.3s var(--ease), color 0.3s var(--ease);
+}
+
+.project-info {
+  display: flex;
+  gap: 13px;
+  padding: 15px;
+  border-top: 1px solid var(--line);
+}
+
+.project-info > span {
+  font-family: var(--mono);
+  font-size: var(--label-lg);
+  font-weight: 700;
+  color: var(--violet);
+  flex: none;
+}
+
+.project-info div {
+  min-width: 0;
+}
+
+.project-info p {
+  font-family: var(--mono);
+  font-size: var(--label);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.project-info h3 {
+  margin-top: 4px;
+  font-family: var(--sans);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.project-info small {
+  display: block;
+  margin-top: 5px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* ============================================================
+   Хронология
+   ============================================================ */
+
+.timeline {
+  display: grid;
+  gap: 0;
+  position: relative;
+}
+
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 12px;
+  bottom: 12px;
+  width: 1px;
+  background: linear-gradient(180deg, var(--violet), var(--blue), transparent);
+}
+
+.tl-item {
+  position: relative;
+  padding: 0 0 30px 34px;
+}
+
+.tl-item:last-child {
+  padding-bottom: 0;
+}
+
+.tl-dot {
+  position: absolute;
+  left: 0;
+  top: 7px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 2px solid var(--violet);
+  background: var(--void);
+}
+
+.tl-item:last-child .tl-dot {
+  border-color: var(--tally-pre);
+  box-shadow: 0 0 0 4px rgba(61, 220, 151, 0.14);
+}
+
+.tl-year {
+  font-family: var(--mono);
+  font-size: var(--label-lg);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--violet);
+}
+
+.tl-item h3 {
+  margin-top: 6px;
+  font-family: var(--sans);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.tl-item p {
+  margin-top: 7px;
+  color: var(--text-2);
+  font-size: 15px;
+  max-width: 56ch;
+}
+
+/* ============================================================
+   Контакт
+   ============================================================ */
+
+.contact-card {
+  display: grid;
+  gap: clamp(28px, 4vw, 48px);
+  padding: clamp(26px, 4vw, 52px);
+  border-radius: clamp(20px, 3vw, 28px);
+  border: 1px solid var(--line-mid);
+  background:
+    radial-gradient(80% 120% at 82% 0%, rgba(99, 102, 241, 0.24), transparent 60%),
+    linear-gradient(180deg, var(--panel-2), var(--panel));
+}
+
+.contact-card h2 {
+  font-size: var(--fs-h2);
+}
+
+.contact-card > div > p {
+  margin-top: 18px;
+  color: var(--text-2);
+  font-size: var(--fs-lead);
+  max-width: 46ch;
+}
+
+.contact-list {
+  display: grid;
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.contact-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 62px;
+  padding: 12px 16px;
+  background: var(--panel);
+  transition: background 0.2s var(--ease);
+}
+
+a.contact-row:hover {
+  background: var(--raise);
+}
+
+.contact-row svg {
+  width: 19px;
+  height: 19px;
+  color: var(--violet);
+  flex: none;
+}
+
+.contact-row div {
+  min-width: 0;
+  flex: 1;
+}
+
+.contact-row small {
+  display: block;
+  font-family: var(--mono);
+  font-size: var(--label);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.contact-row strong {
+  font-size: 15px;
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.contact-row .go {
+  color: var(--faint);
+  font-family: var(--mono);
+  font-size: var(--label-lg);
+}
+
+.contact-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* ============================================================
+   Подвал
+   ============================================================ */
+
+.footer {
+  border-top: 1px solid var(--line);
+  padding-block: 34px 42px;
+  background: rgba(6, 4, 14, 0.7);
+}
+
+.footer-inner {
+  display: grid;
+  gap: 22px;
+}
+
+.footer-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 4px;
+}
+
+.footer-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--muted);
+  transition: color 0.2s var(--ease), background 0.2s var(--ease);
+}
+
+.footer-nav a:hover {
+  color: var(--text);
+  background: var(--glass);
+}
+
+.footer-note {
+  font-family: var(--mono);
+  font-size: var(--label);
+  letter-spacing: 0.08em;
+  color: var(--faint);
+}
+
+.to-top {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 0 18px;
+  width: fit-content;
+  border: 1px solid var(--line-mid);
+  border-radius: 999px;
+  background: var(--glass);
+  font-family: var(--mono);
+  font-size: var(--label);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  transition: border-color 0.2s var(--ease), color 0.2s var(--ease);
+}
+
+.to-top:hover {
+  border-color: var(--line-hot);
+  color: #fff;
+}
+
+/* ============================================================
+   Сигнальный тракт дипломного проекта
+   Раскладка и кривые — из исходной схемы: узлы разнесены
+   несимметрично, связи идут дугами, по ним движутся сигналы.
+   Поверх добавлено: клавиатура, светодиоды и подсветка ветки.
+   ============================================================ */
+
+.tract-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 15px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  border-bottom: 0;
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  font-family: var(--mono);
+  font-size: var(--label);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.tract-toolbar span { display: inline-flex; align-items: center; gap: 10px; color: var(--text-2); }
+.tract-toolbar p { text-transform: none; letter-spacing: 0.02em; color: var(--muted); max-width: 62ch; }
+
+.tract {
+  position: relative;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  background: linear-gradient(180deg, rgba(19, 16, 41, 0.6), rgba(13, 10, 28, 0.6));
+  margin-bottom: clamp(24px, 3.5vw, 40px);
+}
+
+.tract-wires { display: none; }
+
+.tract-nodes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+
+.tract-node {
+  position: relative;
+  display: grid;
+  gap: 3px;
+  align-content: start;
+  padding: 14px 15px;
+  min-height: 96px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  text-align: left;
+  transition: border-color 0.28s var(--ease), transform 0.28s var(--ease),
+    box-shadow 0.28s var(--ease), background 0.28s var(--ease);
+}
+
+.tract-node:hover { border-color: var(--line-mid); transform: translateY(-2px); }
+
+.tract-node[aria-selected="true"] {
+  border-color: var(--line-hot);
+  background: linear-gradient(150deg, rgba(168, 85, 247, 0.2), rgba(59, 130, 246, 0.07));
+  box-shadow: 0 0 0 1px rgba(190, 164, 255, 0.22), 0 16px 44px rgba(99, 102, 241, 0.28);
+}
+
+.tract-node-num { font-family: var(--mono); font-size: var(--label); font-weight: 700; letter-spacing: 0.12em; color: var(--faint); }
+.tract-node[aria-selected="true"] .tract-node-num { color: var(--violet); }
+.tract-node small { font-family: var(--mono); font-size: var(--label); letter-spacing: 0.05em; color: var(--muted); }
+.tract-node strong { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
+.tract-node em { font-style: normal; font-family: var(--mono); font-size: var(--label); color: var(--faint); }
+
+.tract-node i.led {
+  position: absolute; top: 13px; right: 13px;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--line-mid);
+  transition: background 0.28s var(--ease), box-shadow 0.28s var(--ease);
+}
+
+.tract-node[aria-selected="true"] i.led {
+  background: var(--tally-pre);
+  box-shadow: 0 0 0 4px rgba(61, 220, 151, 0.16);
+}
+
+.tract-out {
+  grid-column: span 2;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 14px; padding: 16px 18px; min-height: 96px;
+  border-radius: var(--radius-sm);
+  border: 1px dashed rgba(101, 154, 255, 0.45);
+  background: linear-gradient(145deg, rgba(18, 32, 65, 0.8), rgba(8, 9, 25, 0.88));
+}
+
+.tract-out small { display: block; font-family: var(--mono); font-size: var(--label); letter-spacing: 0.14em; text-transform: uppercase; color: #73a4ff; }
+.tract-out strong { font-family: var(--display); font-size: 18px; font-weight: 700; }
+.tract-out span { display: inline-flex; align-items: center; gap: 9px; font-family: var(--mono); font-size: var(--label); letter-spacing: 0.12em; color: var(--tally-on); white-space: nowrap; }
+.tract-out .tally { background: var(--tally-on); box-shadow: 0 0 0 3px rgba(255, 77, 77, 0.2); animation-name: tally-live; }
+
+/* --- полная схема разворачивается там, где хватает ширины --- */
+@media (min-width: 1000px) {
+  .tract { aspect-ratio: 1200 / 520; padding: 0; }
+
+  .tract-wires {
+    display: block;
+    position: absolute; inset: 0; z-index: 1;
+    width: 100%; height: 100%;
+    overflow: visible;
+  }
+
+  .connector-lines path {
+    fill: none;
+    stroke: url(#tractGradient);
+    stroke-width: 1.7;
+    vector-effect: non-scaling-stroke;
+    opacity: 0.8;
+    filter: drop-shadow(0 0 4px rgba(145, 93, 255, 0.42));
+    transition: opacity 0.3s var(--ease), stroke-width 0.3s var(--ease);
+  }
+
+  .diagram-signals circle { fill: #e4d0ff; filter: drop-shadow(0 0 7px #9b62ff); transition: opacity 0.3s var(--ease); }
+
+  /* выбранная ветка выходит вперёд, соседние уходят в тень */
+  .tract[data-active] .connector-lines path.is-dim { opacity: 0.16; }
+  .tract[data-active] .connector-lines path.is-active { opacity: 1; stroke-width: 2.6; }
+  .tract[data-active] .diagram-signals circle.is-dim { opacity: 0.18; }
+  .tract[data-active] .diagram-signals circle.is-active { r: 5.5; }
+
+  .tract-nodes { display: block; }
+
+  .tract-node, .tract-out {
+    position: absolute;
+    z-index: 2;
+    min-height: 0;
+    grid-column: auto;
+  }
+
+  /* координаты из исходной схемы */
+  .node-overview { left: 4.2%;  top: 9%;    width: 21%; }
+  .node-sheets   { left: 4.2%;  top: 65%;   width: 21%; }
+  .node-vmix     { left: 39.2%; top: 34.5%; width: 22.5%; min-height: 128px;
+                   border-color: rgba(183, 143, 255, 0.48);
+                   background: linear-gradient(145deg, rgba(91, 48, 164, 0.9), rgba(20, 14, 47, 0.96)); }
+  .node-midi     { left: 70.3%; top: 7.5%;  width: 24%; }
+  .node-audio    { left: 74.4%; top: 67%;   width: 20%; }
+  .node-present  { left: 39.2%; top: 76%;   width: 22.5%; }
+  .tract-out     { left: 74.5%; top: 39.5%; width: 20%; min-height: 105px;
+                   flex-direction: column; align-items: flex-start; justify-content: center; gap: 7px; }
+}
+
+/* ============================================================
+   Мультивьюер: наведение забирает источник в PGM
+   ============================================================ */
+
+.project-card figure::before,
+.project-card figure::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid rgba(255,255,255,.34);
+  opacity: 0;
+  transition: opacity .25s var(--ease);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.project-card figure::before { top: 8px; left: 8px; border-right: 0; border-bottom: 0; }
+.project-card figure::after  { bottom: 8px; right: 8px; border-left: 0; border-top: 0; }
+
+.project-card:hover figure::before,
+.project-card:hover figure::after,
+.project-card:focus-within figure::before,
+.project-card:focus-within figure::after { opacity: 1; }
+
+/* Пока один источник в программе, остальные уходят в превью.
+
+   Раньше соседние карточки становились полупрозрачными и обесцвеченными
+   без перехода - щелчком, и сквозь них просвечивал фон. На зазоре между
+   карточками наведения на миг нет ни на одной, и вся сетка вспыхивала.
+
+   Теперь поверх карточки плавно ложится тёмная пелена, сама карточка
+   остаётся непрозрачной. Возврат - с задержкой: пока курсор пересекает
+   зазор, пелена не успевает сняться, и мигания нет. */
+.project-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  pointer-events: none;
+  background: rgba(5, 4, 14, 0.58);
+  opacity: 0;
+  transition: opacity 0.5s var(--ease) 0.14s;
+}
+
+.multiview:has(.project-card:hover) .project-card:not(:hover)::before {
+  opacity: 1;
+  transition: opacity 0.4s var(--ease) 0s;
+}
+
+.project-card:hover::before {
+  opacity: 0;
+  transition: opacity 0.25s var(--ease) 0s;
+}
+
+.project-card:hover {
+  border-color: var(--tally-on);
+  box-shadow: 0 0 0 1px rgba(255,77,77,.55), 0 26px 60px rgba(255,77,77,.18);
+}
+
+.project-card .project-src::after {
+  content: " · PVW";
+  color: var(--faint);
+}
+
+.project-card:hover .project-src {
+  border-color: var(--tally-on);
+  color: #fff;
+  background: rgba(255,77,77,.22);
+}
+
+.project-card:hover .project-src::after {
+  content: " · PGM";
+  color: #fff;
+}
+
+/* ============================================================
+   Герой: типографика поверх портрета, слои с параллаксом
+   ============================================================ */
+
+.hero {
+  --px: 0;
+  --py: 0;
+}
+
+.hero h1 {
+  position: relative;
+  z-index: 3;
+  font-size: clamp(44px, 10.5vw, 128px);
+  letter-spacing: -0.055em;
+  line-height: 0.9;
+  text-wrap: initial;
+}
+
+.hero h1 em {
+  display: inline-block;
+  /* строка-акцент чуть смещается за курсором — даёт глубину */
+  translate: calc(var(--px) * 14px) calc(var(--py) * 8px);
+  will-change: translate;
+}
+
+.hero-lead { position: relative; z-index: 3; }
+
+.hero-visual {
+  translate: calc(var(--px) * -18px) calc(var(--py) * -12px);
+  will-change: translate;
+}
+
+.hero-portrait {
+  scale: 1.04;
+  translate: calc(var(--px) * 10px) calc(var(--py) * 7px);
+  will-change: translate;
+}
+
+/* сканирующая полоса по портрету — эфирная деталь, не декор ради декора */
+.hero-visual .scanline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 22%;
+  z-index: 2;
+  background: linear-gradient(180deg, transparent, rgba(160,190,255,.10) 45%, rgba(200,170,255,.16) 55%, transparent);
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-visual .scanline { animation: scan 7s cubic-bezier(.5,0,.5,1) infinite; }
+}
+
+@keyframes scan {
+  0%   { top: -24%; opacity: 0; }
+  12%  { opacity: 1; }
+  88%  { opacity: 1; }
+  100% { top: 102%; opacity: 0; }
+}
+
+/* угловые метки кадра, как в мультивьюере аппаратной */
+.hero-visual .frame-mark {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 1.5px solid rgba(190,164,255,.5);
+  z-index: 3;
+  pointer-events: none;
+}
+
+.hero-visual .frame-mark.tl { top: 12px; left: 12px; border-right: 0; border-bottom: 0; }
+.hero-visual .frame-mark.br { bottom: 12px; right: 12px; border-left: 0; border-top: 0; }
+
+@media (min-width: 1000px) {
+  /* заголовок заходит на портрет — композиция вместо двух колонок */
+  .hero-inner { grid-template-columns: 1.18fr 0.82fr; }
+  .hero h1 { margin-right: -18%; }
+}
+
+/* ============================================================
+   Брейкпоинты. Mobile-first: снизу вверх.
+   ============================================================ */
+
+@media (min-width: 560px) {
+  .figure-grid,
+  .multiview {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .contact-actions {
+    grid-auto-flow: column;
+    width: fit-content;
+  }
+  .thesis-map {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .map-out {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 760px) {
+  .hero-stats {
+    left: 18px;
+    right: 18px;
+    bottom: 18px;
+    gap: 10px;
+  }
+  .contours {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .stage-points {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .archive-card {
+    grid-template-columns: 1.4fr auto;
+    align-items: center;
+  }
+}
+
+@media (min-width: 1000px) {
+  .topbar nav {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+  .availability {
+    display: inline-flex;
+  }
+  .menu-toggle {
+    display: none;
+  }
+  .mobile-nav {
+    display: none;
+  }
+
+  .hero-inner {
+    grid-template-columns: 1.04fr 0.96fr;
+    align-items: center;
+  }
+  .hero-visual {
+    aspect-ratio: 3 / 4;
+  }
+
+  .profile-grid {
+    grid-template-columns: 1.25fr 0.75fr;
+    align-items: start;
+  }
+
+  .studio {
+    grid-template-columns: 1.55fr 0.95fr;
+    align-items: start;
+  }
+  .studio-player {
+    grid-row: span 2;
+  }
+
+  .thesis-map {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .multiview {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .figure-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .contact-card {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+
+  .footer-inner {
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+  }
+}
+
+@media (min-width: 1280px) {
+  .contours {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .timeline {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+  .timeline::before {
+    left: 12px;
+    right: 12px;
+    top: 7px;
+    bottom: auto;
+    width: auto;
+    height: 1px;
+    background: linear-gradient(90deg, var(--violet), var(--blue), transparent);
+  }
+  .tl-item {
+    padding: 34px 0 0;
+  }
+  .tl-dot {
+    top: 0;
+    left: 4px;
+  }
+}
+
+[hidden] {
+  display: none !important;
+}
+
+
+/* ============================================================
+   Правки после первого просмотра
+   ============================================================ */
+
+/* --- герой: портрет снова крупный --- */
+@media (min-width: 1000px) {
+  .hero-inner { grid-template-columns: 1fr 0.95fr; gap: clamp(28px, 3vw, 48px); }
+  /* заголовок заходит на визуал, но не съедает его ширину */
+  .hero h1 { margin-right: 0; }
+  .hero-visual { aspect-ratio: 4 / 5; }
+}
+
+@media (min-width: 1280px) {
+  .hero-visual { aspect-ratio: 5 / 6; }
+}
+
+.hero-portrait {
+  object-position: 50% 8%;
+  scale: 1.02;
+}
+
+/* статистика: три карточки помещаются, ничего не обрезается */
+.hero-stats { gap: 6px; }
+
+.stat-card { padding: 10px 6px; }
+
+.stat-card b { font-size: clamp(19px, 2.1vw, 26px); }
+
+.stat-card span {
+  font-size: var(--label);
+  letter-spacing: 0.04em;
+  line-height: 1.25;
+  hyphens: auto;
+}
+
+/* --- проекты: 6 обычных + широкий кадр + переход в архив = ровные три ряда --- */
+@media (min-width: 1000px) {
+  .project-card.is-wide { grid-column: span 2; }
+  .project-card.is-wide figure { aspect-ratio: 32 / 9; }
+}
+
+.archive-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 20px;
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--line-hot);
+  background:
+    radial-gradient(80% 90% at 80% 10%, rgba(168, 85, 247, 0.20), transparent 65%),
+    linear-gradient(180deg, var(--panel-2), var(--panel));
+  transition: border-color 0.28s var(--ease), transform 0.28s var(--ease),
+    box-shadow 0.28s var(--ease);
+}
+
+.archive-tile:hover {
+  border-style: solid;
+  border-color: var(--cyan);
+  transform: translateY(-3px);
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.35), 0 24px 56px rgba(34, 211, 238, 0.16);
+}
+
+.archive-tile-count {
+  font-family: var(--display);
+  font-size: clamp(34px, 4vw, 52px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  background: linear-gradient(120deg, var(--cyan), var(--violet));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--cyan);
+}
+
+.archive-tile p {
+  font-family: var(--mono);
+  font-size: var(--label);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.archive-tile strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.archive-tile-go {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--mono);
+  font-size: var(--label);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--cyan);
+}
+
+/* архивная плитка не участвует в затемнении мультивьюера */
+.multiview:has(.project-card:hover) .archive-tile { opacity: 1; filter: none; }
+
+
+/* --- герой: колонка грида не должна распираться заголовком --- */
+.hero-inner > * { min-width: 0; }
+
+/* 128px строка «технический контур» шире любой колонки и выдавливала портрет.
+   96px остаётся крупным, но помещается и оставляет визуалу его половину. */
+.hero h1 {
+  font-size: clamp(36px, 5.4vw, 78px);
+  text-wrap: balance;
+}
+
+@media (min-width: 1000px) {
+  .hero-inner { grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr); }
+}
+
+@media (min-width: 1280px) {
+  .hero-inner { grid-template-columns: minmax(0, 1.1fr) minmax(430px, 0.9fr); }
+}
+
+
+/* ============================================================
+   Приборные детали
+   ============================================================ */
+
+/* полоса эфира: прогресс прокрутки, нативно, без JavaScript */
+.air-progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 2px;
+  z-index: 100;
+  transform-origin: 0 50%;
+  scale: 0 1;
+  background: linear-gradient(90deg, var(--cyan), var(--violet) 55%, var(--magenta));
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.55);
+  pointer-events: none;
+}
+
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .air-progress {
+      animation: air-run linear both;
+      animation-timeline: scroll(root block);
+    }
+  }
+}
+
+@keyframes air-run {
+  from { scale: 0 1; }
+  to   { scale: 1 1; }
+}
+
+/* таймкод: часы аппаратной, кадры считаются от 25 fps */
+.timecode {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 0 13px;
+  min-height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: rgba(4, 3, 10, 0.6);
+  font-family: var(--mono);
+  font-size: var(--label);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.timecode i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--tally-on);
+  box-shadow: 0 0 0 3px rgba(255, 77, 77, 0.18);
+}
+
+.timecode b { font-weight: 500; color: var(--text); }
+
+@media (min-width: 1180px) { .timecode { display: inline-flex; } }
+
+/* магнитные кнопки: притягиваются к курсору */
+.btn {
+  --mx: 0px;
+  --my: 0px;
+  translate: var(--mx) var(--my);
+}
+
+/* счётчики набегают, поэтому ширина не должна прыгать */
+.stat-card b,
+.archive-tile-count { font-variant-numeric: tabular-nums; }
+
+
+/* прокрутка всплывает на html, если clip стоит только на body */
+html { overflow-x: clip; }
+
+
+/* ============================================================
+   Быстрый переключатель этапов
+   Стоит прямо над панелью: сменить этап можно, не возвращаясь
+   к схеме наверх. Схема остаётся основным способом выбора.
+   ============================================================ */
+
+.stage-switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 14px;
+}
+
+.stage-switch-label {
+  flex: 1 0 100%;
+  margin-bottom: 2px;
+  font-family: var(--mono);
+  font-size: var(--label);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.stage-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-2);
+  transition: border-color 0.24s var(--ease), background 0.24s var(--ease),
+    color 0.24s var(--ease), transform 0.24s var(--ease);
+}
+
+.stage-chip b {
+  font-family: var(--mono);
+  font-size: var(--label);
+  font-weight: 700;
+  color: var(--faint);
+}
+
+.stage-chip:hover {
+  border-color: var(--line-mid);
+  transform: translateY(-2px);
+}
+
+.stage-chip[aria-current="true"] {
+  border-color: var(--line-hot);
+  background: linear-gradient(100deg, rgba(168, 85, 247, 0.22), rgba(59, 130, 246, 0.08));
+  color: #fff;
+}
+
+.stage-chip[aria-current="true"] b { color: var(--violet); }
+
+/* --- контуры: длинные заголовки больше не вылезают --- */
+.contour-head {
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.contour-head h3 {
+  min-width: 0;
+  font-size: clamp(19px, 0.7vw + 16px, 23px);
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+
+.contour { min-width: 0; }
+.contour > div { min-width: 0; }
+.contour p { overflow-wrap: anywhere; }
+
+/* на четырёх колонках карточка узкая — заголовку нужен свой ряд */
+@media (min-width: 1280px) {
+  .contour-head { flex-direction: column; align-items: flex-start; gap: 4px; }
+}
+
+
+/* ============================================================
+   Захват сигнала: короткая заставка перед первым кадром
+   ============================================================ */
+
+.signal-lock {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-content: center;
+  gap: 18px;
+  justify-items: center;
+  background: var(--void);
+  transition: opacity 0.6s var(--ease), visibility 0.6s;
+}
+
+.signal-lock.is-done {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.signal-lock-label {
+  font-family: var(--mono);
+  font-size: var(--label);
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.signal-lock-bar {
+  width: min(260px, 60vw);
+  height: 2px;
+  background: rgba(163, 143, 255, 0.18);
+  overflow: hidden;
+}
+
+.signal-lock-bar i {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, var(--cyan), var(--violet), var(--magenta));
+  transition: width 0.25s linear;
+}
+
+.signal-lock-value {
+  font-family: var(--mono);
+  font-size: var(--label-lg);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-2);
+}
+
+/* ============================================================
+   Подсветка под курсором: карточка светится изнутри
+   ============================================================ */
+
+.card,
+.contour,
+.project-card,
+.stage-point,
+.archive-tile,
+.case-copy,
+.stage-panel {
+  --sx: 50%;
+  --sy: 50%;
+  position: relative;
+}
+
+.card::after,
+.contour::after,
+.project-card::after,
+.stage-point::after,
+.archive-tile::after,
+.case-copy::after,
+.stage-panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s var(--ease);
+  background: radial-gradient(
+    260px circle at var(--sx) var(--sy),
+    rgba(190, 164, 255, 0.14),
+    transparent 62%
+  );
+  z-index: 1;
+}
+
+.card:hover::after,
+.contour:hover::after,
+.project-card:hover::after,
+.stage-point:hover::after,
+.archive-tile:hover::after,
+.case-copy:hover::after,
+.stage-panel:hover::after {
+  opacity: 1;
+}
+
+/* содержимое остаётся над подсветкой */
+.contour > *,
+.project-card > *,
+.archive-tile > *,
+.stage-point > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* ============================================================
+   Подсказка по клавишам
+   ============================================================ */
+
+.keyhint {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  font-family: var(--mono);
+  font-size: var(--label);
+  letter-spacing: 0.06em;
+  color: var(--faint);
+}
+
+.keyhint kbd {
+  display: inline-grid;
+  place-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 6px;
+  border: 1px solid var(--line-mid);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  background: var(--panel-2);
+  font-family: var(--mono);
+  font-size: var(--label);
+  color: var(--text-2);
+}
+
+@media (min-width: 1000px) and (hover: hover) {
+  .keyhint { display: flex; }
+}
+
+/* ============================================================
+   Параллакс кадров при прокрутке — нативно
+   ============================================================ */
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .project-card figure img,
+    .contour-media img {
+      animation: card-drift linear both;
+      animation-timeline: view();
+      animation-range: entry 0% exit 100%;
+    }
+  }
+}
+
+@keyframes card-drift {
+  from { scale: 1.12; translate: 0 -2%; }
+  to   { scale: 1.02; translate: 0 2%; }
+}
+
+
+/* ============================================================
+   Шаги этапа: кнопки «назад / вперёд» рядом с чипами
+   ============================================================ */
+
+.stage-steps {
+  display: inline-flex;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.stage-step {
+  display: inline-grid;
+  place-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid var(--line-mid);
+  background: var(--panel);
+  color: var(--text-2);
+  transition: border-color 0.22s var(--ease), color 0.22s var(--ease),
+    transform 0.22s var(--ease);
+}
+
+.stage-step:hover {
+  border-color: var(--line-hot);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.stage-step svg { width: 16px; height: 16px; }
+
+/* ============================================================
+   Активный раздел в навигации
+   ============================================================ */
+
+.topbar nav a { position: relative; }
+
+.topbar nav a[aria-current="true"] {
+  color: #fff;
+  background: var(--glass-2);
+}
+
+.topbar nav a[aria-current="true"]::after {
+  content: "";
+  position: absolute;
+  left: 13px;
+  right: 13px;
+  bottom: 4px;
+  height: 1.5px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--cyan), var(--violet));
+}
+
+/* ============================================================
+   Наклон карточек под курсором
+   ============================================================ */
+
+.contour {
+  --tilt-x: 0deg;
+  --tilt-y: 0deg;
+  transform: perspective(900px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+  transform-style: preserve-3d;
+}
+
+.contour:hover {
+  /* поднимаем карточку, сохраняя наклон */
+  transform: perspective(900px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translateY(-3px);
+}
+
+/* ============================================================
+   Фильтр проектов
+   ============================================================ */
+
+.project-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 18px;
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 15px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-2);
+  transition: border-color 0.24s var(--ease), background 0.24s var(--ease),
+    color 0.24s var(--ease), transform 0.24s var(--ease);
+}
+
+.filter-chip b {
+  font-family: var(--mono);
+  font-size: var(--label);
+  font-weight: 700;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.filter-chip:hover { border-color: var(--line-mid); transform: translateY(-2px); }
+
+.filter-chip[aria-pressed="true"] {
+  border-color: var(--line-hot);
+  background: linear-gradient(100deg, rgba(34, 211, 238, 0.18), rgba(168, 85, 247, 0.1));
+  color: #fff;
+}
+
+.filter-chip[aria-pressed="true"] b { color: var(--cyan); }
+
+/* карточка, не прошедшая фильтр, уходит из потока плавно */
+.project-card[hidden],
+.archive-tile[hidden] { display: none !important; }
+
+
+/* ============================================================
+   КОНЦЕПЦИЯ «СИГНАЛ» — перламутровый слой
+   Палитра тонкой плёнки: холодная в начале пути, тёплая к финалу.
+   ============================================================ */
+
+:root {
+  --void: #030309;
+  --ground: #06060f;
+  --panel: #0b0b18;
+  --panel-2: #101024;
+  --raise: #17163150;
+
+  --pearl-cyan: #7fe7ff;
+  --pearl-violet: #a78bfa;
+  --pearl-rose: #ff8ad4;
+  --pearl-gold: #ffd79a;
+
+  --line: rgba(167, 139, 250, 0.13);
+  --line-mid: rgba(180, 160, 255, 0.26);
+  --line-hot: rgba(200, 180, 255, 0.6);
+
+  --text: #f3f1ff;
+  --text-2: #cbc6e4;
+  --muted: #9e98bc;
+  --faint: #8d87ab;
+
+  --focus: #b9a6ff;
+}
+
+/* сквозная субстанция лежит между подложкой и содержимым */
+#glass {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.backdrop {
+  background:
+    radial-gradient(70ch 50ch at 74% -8%, rgba(127, 231, 255, 0.07), transparent 62%),
+    radial-gradient(60ch 44ch at 10% 16%, rgba(167, 139, 250, 0.09), transparent 60%),
+    radial-gradient(70ch 50ch at 52% 106%, rgba(255, 138, 212, 0.06), transparent 64%),
+    var(--void);
+}
+
+.grid-lines { opacity: 0.2; }
+
+/* ============================================================
+   Появление раскрытием маски — как титр в эфире
+   ============================================================ */
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: mask-reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 2% cover 24%;
+    }
+  }
+}
+
+@keyframes mask-reveal {
+  from { clip-path: inset(0 0 100% 0); opacity: 0; transform: translateY(18px); }
+  60%  { opacity: 1; }
+  to   { clip-path: inset(0 0 0 0); opacity: 1; transform: none; }
+}
+
+/* заголовки разделов выезжают строкой из-под шторки */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .section-head h2 {
+      animation: title-wipe linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 22%;
+    }
+  }
+}
+
+@keyframes title-wipe {
+  from { clip-path: inset(0 100% 0 0); }
+  to   { clip-path: inset(0 0 0 0); }
+}
+
+/* ============================================================
+   Чистка визуального шума
+   Половина блоков теряет рамку и живёт на воздухе.
+   ============================================================ */
+
+.card,
+.case-copy,
+.stage-panel {
+  border-color: transparent;
+  background: linear-gradient(180deg, rgba(16, 16, 36, 0.62), rgba(11, 11, 24, 0.5));
+  backdrop-filter: blur(14px);
+}
+
+.card::before,
+.stage-panel::before { opacity: 0.5; }
+
+.profile-facts,
+.contact-list { background: var(--line); }
+
+.profile-fact,
+.contact-row { background: rgba(9, 9, 20, 0.90); backdrop-filter: blur(10px); }
+
+/* приборные детали становятся тише */
+.timecode { border-color: transparent; background: transparent; color: var(--faint); }
+.timecode b { color: var(--muted); }
+.project-src { background: rgba(4, 4, 12, 0.72); border-color: transparent; }
+.tract-node i.led { opacity: 0.55; }
+.tract-node[aria-selected="true"] i.led { opacity: 1; }
+
+/* больше воздуха между разделами */
+.section { padding-block: clamp(84px, 12vw, 190px); }
+.section-head { margin-bottom: clamp(40px, 5vw, 72px); }
+
+/* ============================================================
+   Герой в новой стилистике
+   ============================================================ */
+
+/* окно портрета: рамку убираем, стекло само обрисует границу */
+.hero-visual {
+  border-color: transparent;
+  background: transparent;
+  overflow: visible;
+}
+
+.hero-visual::after { display: none; }
+
+.hero-portrait {
+  mask-image: radial-gradient(120% 96% at 50% 42%, #000 52%, transparent 88%);
+  opacity: 0.9;
+}
+
+.hero-visual .frame-mark { opacity: 0.35; }
+
+/* Градиентный заголовок - типовой признак AI-вёрстки.
+   Акцент держим сплошным цветом, контраст выше, читается лучше. */
+.hero h1 em {
+  color: var(--pearl-violet);
+}
+
+.stat-card {
+  border-color: transparent;
+  background: rgba(6, 6, 16, 0.6);
+  backdrop-filter: blur(16px);
+}
+
+.stat-card b {
+  background: linear-gradient(120deg, var(--pearl-cyan), var(--pearl-rose));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--pearl-cyan);
+}
+
+.btn-primary {
+  background: linear-gradient(120deg, var(--pearl-violet), var(--pearl-cyan) 52%, var(--pearl-rose));
+  color: #0a0714;
+  box-shadow: 0 14px 38px rgba(10, 8, 24, 0.55);
+}
+
+.btn-primary:hover { box-shadow: 0 22px 56px rgba(127, 231, 255, 0.38); }
+
+.air-progress {
+  background: linear-gradient(90deg, var(--pearl-cyan), var(--pearl-violet) 50%, var(--pearl-rose));
+  box-shadow: 0 0 8px rgba(167, 139, 250, 0.22);
+}
+
+
+/* нативная плавность спорит с инерционной прокруткой */
+@media (hover: hover) and (pointer: fine) {
+  html { scroll-behavior: auto; }
+}
+
+
+
+
+/* ============================================================
+   Правки после прогона по чек-листу вкуса
+   ============================================================ */
+
+/* Заливку текста нужно вернуть явно: одного color мало,
+   пока где-то выше стоит -webkit-text-fill-color: transparent. */
+.hero h1 em {
+  background: none;
+  -webkit-text-fill-color: currentColor;
+  color: var(--pearl-violet);
+}
+
+/* Заголовок держим в две строки: при 69px первая строка шире колонки
+   и переносилась, давая четыре строки вместо двух. */
+.hero h1 {
+  font-size: clamp(32px, 4.4vw, 60px);
+  text-wrap: initial;
+  letter-spacing: -0.04em;
+}
+
+
+
+
+/* ============================================================
+   Убрано свечение вокруг портрета
+
+   Светлый прямоугольник за фигурой давала сканирующая полоса
+   с режимом наложения screen, а тёмную кромку снизу - градиент
+   на псевдоэлементе. Фотография должна лежать на чистом фоне.
+   ============================================================ */
+
+.hero-visual .scanline { display: none; }
+.hero-visual::after { display: none; }
+.hero-visual { background: none; box-shadow: none; }
+.hero-portrait { mask-image: none; opacity: 1; }
+
+
+/* ============================================================
+   Живые формы
+
+   Два готовых 3D-рендера идут одним слоем сквозь всю страницу.
+   Фоновый канвас лежит в подложке, передний - дуга перед
+   портретом - висит отдельным фиксированным слоем над героем.
+   ============================================================ */
+
+#forms {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+
+#forms-front {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 6;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+
+html.forms-on #forms,
+html.forms-on #forms-front { opacity: 1; }
+
+/* Сетка спорит с формами за внимание - при живом слое приглушаем. */
+html.forms-on .grid-lines { opacity: 0.12; }
+
+@media (prefers-reduced-motion: reduce) {
+  #forms,
+  #forms-front { transition: none; }
+}
+
+
+/* ============================================================
+   Голографическая фольга под содержимым
+
+   Слои снизу вверх: градиентная подложка (фолбэк без WebGL2),
+   фольга, формы. У всех отрицательный z-index, поэтому текст и
+   карточки остаются выше без единого правила.
+   ============================================================ */
+
+#holo {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+
+html.holo-on #holo { opacity: 1; }
+
+.backdrop { z-index: -3; }
+
+/* Сетка спорит с фольгой за внимание: при живом материале убираем. */
+html.holo-on .grid-lines { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  #holo { transition: none; }
+}
+
+/* Мелкие подписи лежат на полупрозрачных плашках, сквозь которые
+   светит фольга. На градиентной подложке этого хватало, на живом
+   материале запас по контрасту падал до 4.6 при норме 4.5 — поэтому
+   под живым фоном плашки становятся плотнее. */
+html.holo-on .stage-point {
+  background: rgba(8, 6, 18, 0.82);
+  backdrop-filter: blur(10px);
+}
+
+html.holo-on .tract-node {
+  background: rgba(9, 8, 22, 0.72);
+  backdrop-filter: blur(10px);
+}
+
+html.holo-on .tract-node[aria-selected="true"] {
+  background:
+    linear-gradient(150deg, rgba(168, 85, 247, 0.24), rgba(59, 130, 246, 0.1)),
+    rgba(9, 8, 22, 0.82);
+}
+
+
+/* ============================================================
+   Этап диплома: навигация - разбор - кадры
+
+   Три колонки, как на исходном сайте: слева вертикальный список
+   этапов, посередине разбор, справа кадры. Кадров на этап бывает
+   3, 4, 3, 5, 3, 4 - в три колонки четвёрка давала ряд из трёх и
+   одинокий кадр под ним. Здесь кадры идут по два, а при нечётном
+   количестве последний занимает оба места, поэтому ряд закрывается
+   при любом этапе.
+   ============================================================ */
+
+.stage-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-content: start;
+}
+
+.stage-nav .stage-switch-label {
+  font-family: var(--mono);
+  font-size: var(--label);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 2px;
+}
+
+.stage-nav .stage-chip {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  width: 100%;
+  min-height: 56px;
+  padding: 0 15px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: rgba(9, 8, 22, 0.72);
+  backdrop-filter: blur(10px);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-2);
+  text-align: left;
+  transition: border-color 0.24s var(--ease), background 0.24s var(--ease),
+    color 0.24s var(--ease), transform 0.24s var(--ease);
+}
+
+.stage-nav .stage-chip b {
+  font-family: var(--mono);
+  font-size: var(--label-lg);
+  font-weight: 700;
+  color: var(--faint);
+  flex: none;
+}
+
+/* стрелка показывает, что строка кликабельна */
+.stage-nav .stage-chip::after {
+  content: "↗";
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--faint);
+}
+
+.stage-nav .stage-chip:hover {
+  border-color: var(--line-mid);
+  transform: translateX(3px);
+}
+
+.stage-nav .stage-chip[aria-current="true"] {
+  border-color: var(--line-hot);
+  background:
+    linear-gradient(120deg, rgba(167, 139, 250, 0.26), rgba(127, 231, 255, 0.08)),
+    rgba(9, 8, 22, 0.86);
+  color: #fff;
+}
+
+.stage-nav .stage-chip[aria-current="true"] b,
+.stage-nav .stage-chip[aria-current="true"]::after { color: var(--pearl-violet); }
+
+.stage-nav .stage-steps {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.stage-nav .stage-steps .stage-step { flex: 1; }
+
+.stage-shots-head {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.stage-shots-hint {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--muted);
+  max-width: 42ch;
+}
+
+.stage-panel .figure-grid { margin-top: 0; }
+
+@media (min-width: 1000px) {
+  .stage-panel {
+    display: grid;
+    grid-template-columns: minmax(200px, 0.62fr) minmax(0, 1.15fr) minmax(0, 1.25fr);
+    column-gap: clamp(22px, 2.6vw, 40px);
+    align-items: start;
+  }
+
+  .figure-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 700px) and (max-width: 999px) {
+  .stage-panel {
+    display: grid;
+    grid-template-columns: minmax(190px, 0.7fr) minmax(0, 1.6fr);
+    column-gap: 26px;
+    align-items: start;
+  }
+  .stage-nav { grid-row: span 2; }
+}
+
+/* Нечётное число кадров: последний занимает ряд целиком.
+   :last-child:nth-child(odd) истинно ровно тогда, когда кадров
+   нечётное число - считать их в JS не нужно. */
+.figure-grid:has(> :last-child:nth-child(odd)) > :last-child {
+  grid-column: 1 / -1;
+}
+
+
+/* ============================================================
+   Диплом: блок шире, тезисы списком
+
+   Тезисы этапа стояли в три колонки. Внутри средней колонки панели
+   на каждый приходилось меньше полутора сотен пикселей, текст лез
+   на кадры справа. В исходной версии сайта это был вертикальный
+   список - возвращаю его, а самой секции даю больше ширины.
+   ============================================================ */
+
+#thesis {
+  width: min(1640px, 100vw - clamp(20px, 4vw, 56px));
+}
+
+.stage-panel .stage-points {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  margin-top: 22px;
+}
+
+.stage-panel .stage-point {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 16px;
+  align-items: baseline;
+  padding: 14px 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  background: none;
+}
+
+.stage-panel .stage-point:first-child { border-top: 0; padding-top: 4px; }
+
+.stage-panel .stage-point b {
+  font-family: var(--mono);
+  font-size: var(--label);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--pearl-violet);
+}
+
+.stage-panel .stage-point p {
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text-2);
+  overflow-wrap: anywhere;
+}
+
+/* Заголовок этапа не должен переносить слово по буквам. */
+.stage-panel h3 { text-wrap: balance; }
+
+
+/* ============================================================
+   Иконки на орбите формы
+
+   Слой клонов поверх страницы. Сама бегущая строка не трогается:
+   она просто гаснет, поэтому её собственная анимация и разметка
+   остаются целыми, а движение назад ничего не ломает.
+   ============================================================ */
+
+/* Иконки - часть фоновой сцены: они летят с формой, а не поверх
+   страницы. Отрицательный z-index держит их под текстом и карточками,
+   а порядок в разметке - выше канваса форм. */
+.icon-orbit {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.icon-orbit img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 22px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 0 12px rgba(167, 139, 250, 0.45));
+  will-change: transform;
+}
+
+/* Строка не гаснет целиком: пропадают только логотипы, каждый в свой
+   момент. Оставшийся текст и пустые места делают уход очевидным. */
+.ticker.is-lifted .ticker-track { animation-play-state: paused; }
+.ticker-item img { transition: opacity 0.25s ease; }
+
+@media (prefers-reduced-motion: reduce) {
+  .icon-orbit { display: none; }
+  .ticker.is-lifted .ticker-track { animation-play-state: running; }
+}
+
+
+/* ============================================================
+   Каскадное появление секции
+
+   Состоянием управляет скрипт через Web Animations API, а не классы
+   и переходы: браузер иногда не пересчитывает стиль после смены
+   класса, и тогда секция просто не появлялась. Здесь анимация
+   создаётся явным вызовом - ей нечему не сработать.
+
+   В CSS остаётся только одно: старое общее появление не должно
+   спорить с каскадом.
+   ============================================================ */
+
+html.cascade-on [data-cascade] .reveal {
+  animation: none !important;
+  opacity: 1;
+  transform: none;
+}
+
+/* ============================================================
+   Облака под текстом
+
+   Облако лежит под текстовым блоком, который стоит прямо на фоне, и
+   выходит за него со всех сторон: над самим блоком оно плотное, за его
+   краем растворяется в ноль. Контур не прямоугольный - к мягкому
+   прямоугольнику добавлены четыре пятна у кромок, и край получается
+   неровным, как у облака.
+
+   Раньше облако было одно на всю секцию. Выходил прямоугольник во всю
+   ширину контента с пустым тёмным полем в верхнем отступе, заголовок
+   начинался ровно на его кромке и казался прилипшим к блоку, а секции
+   с content-visibility обрезали облако по своей границе - отсюда
+   жёсткие вертикальные края. Поэтому облака теперь живут в отдельном
+   слое на уровне страницы, и секции их не режут. Геометрию считает
+   app.js, --px и --py - вынос облака за блок.
+   ============================================================ */
+
+.has-cloud { position: relative; }
+
+.cloud-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.cloud {
+  position: absolute;
+  background: rgba(5, 4, 14, 0.52);
+  -webkit-mask-image:
+    radial-gradient(closest-side, #000 30%, transparent),
+    radial-gradient(closest-side, #000 30%, transparent),
+    radial-gradient(closest-side, #000 30%, transparent),
+    radial-gradient(closest-side, #000 30%, transparent),
+    linear-gradient(to right, transparent, #000 var(--px), #000 calc(100% - var(--px)), transparent),
+    linear-gradient(to bottom, transparent, #000 var(--py), #000 calc(100% - var(--py)), transparent);
+  mask-image:
+    radial-gradient(closest-side, #000 30%, transparent),
+    radial-gradient(closest-side, #000 30%, transparent),
+    radial-gradient(closest-side, #000 30%, transparent),
+    radial-gradient(closest-side, #000 30%, transparent),
+    linear-gradient(to right, transparent, #000 var(--px), #000 calc(100% - var(--px)), transparent),
+    linear-gradient(to bottom, transparent, #000 var(--py), #000 calc(100% - var(--py)), transparent);
+  -webkit-mask-position: 6% 10%, 64% 2%, 97% 72%, 28% 98%, 0 0, 0 0;
+  mask-position: 6% 10%, 64% 2%, 97% 72%, 28% 98%, 0 0, 0 0;
+  -webkit-mask-size: 30% 46%, 38% 40%, 26% 58%, 42% 40%, 100% 100%, 100% 100%;
+  mask-size: 30% 46%, 38% 40%, 26% 58%, 42% 40%, 100% 100%, 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-composite: source-over, source-over, source-over, source-over, source-in;
+  mask-composite: add, add, add, add, intersect;
+}
+
+/* Размытие дорогое: подложка живая и пересчитывается каждый кадр.
+   Включаем его только у облаков рядом с экраном. */
+.cloud.is-live {
+  backdrop-filter: blur(18px) saturate(0.9);
+  -webkit-backdrop-filter: blur(18px) saturate(0.9);
+}
+
+
+/* ============================================================
+   Оптимизация: размытие фона только там, где оно нужно
+
+   Размытие фона обходится дорого: компоновщик снимает подложку,
+   размывает и накладывает - и делает это каждый кадр, потому что
+   фон под ним живой. Таких мест набралось 46 штук плюс семь облаков,
+   в сумме 12.7 млн пикселей размытия при экране в 1.3 млн.
+
+   Разделять содержимое от фона на самом деле помогает не размытие,
+   а непрозрачность подложки. Поэтому размытие снимается везде, кроме
+   шапки, мобильного меню и диалога, а плашки становятся плотнее -
+   контраст от этого только растёт.
+   ============================================================ */
+
+.card,
+.stat-card,
+.profile-fact,
+.contact-row,
+.contact-list,
+.stage-point,
+.stage-panel,
+.stage-nav .stage-chip,
+.tract-node,
+.case-copy,
+.project-src,
+.hero-chip,
+.profile-signals span,
+.tag-row span,
+.badge {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.card { background: linear-gradient(180deg, rgba(14, 12, 30, 0.62), rgba(9, 8, 20, 0.62)); }
+.stat-card { background: rgba(6, 6, 16, 0.82); }
+.stage-point { background: rgba(7, 6, 16, 0.93); }
+.tract-node { background: rgba(8, 7, 20, 0.93); }
+.stage-nav .stage-chip { background: rgba(9, 8, 22, 0.86); }
+.profile-signals span { background: rgba(10, 7, 22, 0.92); }
+.project-src { background: rgba(6, 4, 14, 0.92); }
+.hero-chip { background: rgba(11, 8, 24, 0.94); }
+
+/* Облако размывает фон только у секции, до которой уже долистали.
+   Класс вешает тот же покадровый расчёт, что ведёт каскад. */
+
+/* Те же плашки задавались с оглядкой на живой фон, и там специфичность
+   выше - снимаем размытие ровно теми же селекторами. */
+html.holo-on .tract-node,
+html.holo-on .tract-node[aria-selected="true"],
+html.holo-on .stage-point,
+html.holo-on .profile-fact,
+html.holo-on .contact-row {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+html.holo-on .tract-node { background: rgba(8, 7, 20, 0.93); }
+html.holo-on .stage-point { background: rgba(7, 6, 16, 0.93); }
+
+/* Плотная подложка у пунктов появилась вместо размытия, а отступы
+   остались от раскладки без подложки - 14px 0. Номер и текст упирались
+   в края плашки. Даём воздух по бокам. */
+html.holo-on .stage-panel .stage-point { padding: 14px 18px; }
+
+/* Номер узла схемы был окрашен --violet: на прозрачной плашке поверх
+   живого фона это давало 4.4 при норме 4.5. Берём светлый перламутр
+   из той же палитры - контраст растёт, оттенок остаётся. */
+.tract-node-num { color: var(--pearl-violet); }
+.tract-node[aria-selected="true"] .tract-node-num { color: #d9ccff; }
+
+
+/* ============================================================
+   Низ портрета
+
+   Вырезанная фигура заканчивалась резкой горизонталью: было видно,
+   где кончается картинка. Низ теперь растворяется, а под ногами
+   лежит световая полоса - фигура стоит на свету, а не обрывается.
+   ============================================================ */
+
+.hero-portrait {
+  -webkit-mask-image: linear-gradient(180deg, #000 62%, rgba(0, 0, 0, 0.55) 82%, transparent 97%);
+  mask-image: linear-gradient(180deg, #000 62%, rgba(0, 0, 0, 0.55) 82%, transparent 97%);
+}
+
+.hero-floor {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  bottom: 16%;
+  height: 34%;
+  z-index: 1;
+  pointer-events: none;
+
+  /* Пятно света на полу: широкий низкий эллипс в палитре сайта. */
+  background:
+    radial-gradient(58% 100% at 50% 100%,
+      rgba(167, 139, 250, 0.30), rgba(127, 231, 255, 0.10) 46%, transparent 74%);
+  filter: blur(2px);
+}
+
+/* Кромка света: тонкая линия, на которой стоит фигура. */
+.hero-floor::after {
+  content: "";
+  position: absolute;
+  left: 14%;
+  right: 14%;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent, rgba(190, 164, 255, 0.55) 22%, rgba(127, 231, 255, 0.75) 50%,
+    rgba(190, 164, 255, 0.55) 78%, transparent);
+}
+
+
+/* ============================================================
+   Заставка
+
+   Чёрный лист, линия, полоса с таймкодом и обратный отсчёт. В конце
+   экран пересекает стингер - эфирная перебивка из четырёх слоёв.
+
+   Плашка светлая намеренно: тёмная на тёмном фоне не читалась вовсе,
+   и весь проезд выглядел одной тонкой линией. Светлая читается как
+   вспышка света, а страницу вскрывает её тёмный задний край.
+   ============================================================ */
+
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.intro-sheet {
+  position: absolute;
+  inset: 0;
+  background: var(--void);
+}
+
+.intro-rule {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(720px, 78vw);
+  /* Половина ширины с минусом. Раньше стояло min(-360px, -39vw): min
+     выбирал более отрицательное, и на широком экране линии уезжали
+     влево на сотни пикселей. */
+  margin-left: calc(min(720px, 78vw) / -2);
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent, var(--pearl-violet) 18%, var(--pearl-cyan) 50%,
+    var(--pearl-violet) 82%, transparent);
+  transform: scaleX(0);
+  will-change: transform, translate;
+}
+
+.intro-band {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 2.2vw, 24px);
+  /* Оптический центр надписи - середина строчных, а не рамка строки:
+     «Эфир через» почти вся из строчных, и её середина лежит на 7% кегля
+     ниже центра рамки. Поднимаем строку, чтобы между линиями по центру
+     стояли буквы, а не пустое место над ними. */
+  transform: translate(-50%, calc(-50% - clamp(1.4px, 0.24vw, 2.8px)));
+  white-space: nowrap;
+  opacity: 0;
+}
+
+/* Таймкод стоит в полосе и набран тем же моноширинным, что и подписи,
+   только крупнее: отдельной строкой под полосой он висел сбоку и
+   выбивался из композиции. */
+.intro-clock {
+  font-family: var(--mono);
+  font-size: clamp(17px, 1.8vw, 22px);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  font-variant-numeric: tabular-nums;
+  color: var(--pearl-cyan);
+  /* Цифры по высоте - как заглавные, а надпись рядом из строчных.
+     Выравнивание рамок ставило таймкод на 3.5px выше букв; опускаем
+     его на середину строчных надписи. */
+  position: relative;
+  top: 0.16em;
+}
+
+.intro-word {
+  font-family: var(--display);
+  font-size: clamp(20px, 3.4vw, 40px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+
+.intro-tally {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--tally-on);
+  transform: scale(0);
+  flex: none;
+  position: relative;
+  top: clamp(1.4px, 0.24vw, 2.8px);      /* на ту же середину строчных */
+}
+
+/* Полоса с таймкодом и линии лежат над плашкой. До старта стингера
+   плашка уже стоит на исходной позиции, и её глухая часть накрывает
+   весь экран - без этого отсчёт прятался под ней целиком. Полоса гаснет
+   в первые две сотни миллисекунд проезда, раньше, чем до неё доходит
+   кромка, поэтому поверх плашки её не видно. */
+.intro-rule,
+.intro-band { z-index: 2; /* над плашкой */ }
+.intro-flash { z-index: 3; }
+
+/* ---------- стингер ----------
+
+   Одна плашка делает всю работу перехода, и это принципиально.
+   Слева направо она устроена так:
+
+     0-34%    прозрачный хвост: светлая вуаль, альфа от нуля до плотной
+     34-62%   тело: сиреневое -> перламутр -> белая кромка
+     62-100%  глухая заливка цветом фона
+
+   Правая половина - это и есть ещё не вскрытый экран. Пока плашка
+   едет, глухая часть уходит вправо, за ней проезжает тело, а следом
+   идёт вуаль, сквозь которую страница проявляется постепенно.
+
+   Два решения здесь неочевидны и оба вынужденные.
+
+   Вуаль светлая. Тёмную по тёмному сайту не видно ни при какой альфе -
+   прозрачности как будто нет вовсе.
+
+   Тело тоже светлое по всей длине. Раньше между яркой кромкой и
+   вуалью стоял тёмный непрозрачный кусок в пол-экрана. Он сливался с
+   фоном страницы, и единственной заметной границей оставался задний
+   край яркой полосы - переход читался катом, хотя альфа была на месте.
+   Теперь плашка светится целиком и растворяется прямо из яркого.
+
+   Длина хвоста - треть плашки, около ширины экрана: короткий хвост
+   проскакивает за пару кадров.
+   ---------- */
+
+/* Наклон и ключевые кадры проезда задаёт сценарий: они зависят от
+   пропорций экрана. На узком высоком экране косой срез уносит края
+   плашки далеко вбок, и зашитые числа переставали закрывать кадр. */
+.st {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  transform: skewX(-13deg) translateX(-240vw);
+  will-change: transform;
+}
+
+.st-body {
+  width: 340vw;
+  background: linear-gradient(90deg,
+    rgba(199, 214, 255, 0) 0%,
+    rgba(192, 206, 255, 0.16) 7%,
+    rgba(178, 188, 255, 0.34) 14%,
+    rgba(162, 162, 250, 0.54) 21%,
+    rgba(142, 130, 242, 0.74) 27%,
+    rgba(124, 106, 230, 0.90) 31%,
+    #7b5fd6 34%,
+    #6a45c8 42%,
+    #8a6ae8 50%,
+    #a78bfa 56%,
+    #7fe7ff 59%,
+    #eef3ff 60.5%,
+    #ffffff 61.5%,
+    #05030c 62.3%,
+    #05030c 100%);
+}
+
+.st-body::before {
+  content: "";
+  position: absolute;
+  inset: 0 38% 0 34%;
+  background: repeating-linear-gradient(90deg,
+    rgba(10, 8, 30, 0.14) 0 2px,
+    transparent 2px 46px);
+}
+
+/* Клеймо на плашке, как на эфирной перебивке. */
+.st-body::after {
+  content: "!0!2";
+  position: absolute;
+  left: 47%;
+  top: 50%;
+  transform: translate(-50%, -50%) skewX(calc(-1 * var(--st-skew, -13deg)));
+  font-family: var(--display);
+  font-size: clamp(44px, 8vw, 120px);
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  color: rgba(10, 8, 26, 0.5);
+}
+
+/* Лезвие идёт впереди белой кромки - светом по ещё закрытому экрану. */
+.st-blade {
+  width: 6vw;
+  background: linear-gradient(90deg,
+    rgba(167, 139, 250, 0) 0%,
+    rgba(167, 139, 250, 0.8) 40%,
+    rgba(255, 255, 255, 1) 74%,
+    rgba(127, 231, 255, 0.95) 88%,
+    rgba(255, 138, 212, 0) 100%);
+  box-shadow: 0 0 90px 22px rgba(190, 220, 255, 0.5);
+}
+
+/* Хвосты отстают от плашки и проходят уже по вскрытой странице, поэтому
+   они светлые и полупрозрачные: тёмные снова закрывали бы кадр. */
+.st-tail {
+  background: linear-gradient(90deg,
+    rgba(167, 139, 250, 0) 0%,
+    rgba(167, 139, 250, 0.26) 34%,
+    rgba(127, 231, 255, 0.34) 72%,
+    rgba(238, 243, 255, 0.48) 94%,
+    rgba(238, 243, 255, 0) 100%);
+}
+
+.st-tail-a { width: 10vw; opacity: 0.75; }
+.st-tail-b { width: 4vw; opacity: 0.55; }
+
+/* Вспышка в момент прохода лезвия. */
+.intro-flash {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(80% 120% at 40% 50%,
+    rgba(220, 235, 255, 0.9), rgba(167, 139, 250, 0.35) 55%, transparent 80%);
+  opacity: 0;
+}
+
+/* Прокрутка открывается, только когда заставка полностью ушла.
+
+   Место под полосу прокрутки резервируется заранее: без этого в момент
+   снятия замка полоса появлялась, ширина содержимого менялась, и вся
+   страница прыгала вбок - со стороны это читалось как рывок сразу
+   после стингера. */
+html { scrollbar-gutter: stable; }
+html:not(.is-open) body { overflow: hidden; }
+
+@media (prefers-reduced-motion: reduce) {
+  .intro { display: none; }
+}

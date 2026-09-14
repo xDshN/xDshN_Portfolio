@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#05030c">
+<meta name="color-scheme" content="dark">
+
+<title>Андрей Варнавский - инженер прямого эфира</title>
+<meta name="description" content="Инженер прямого эфира и мультимедийных систем. vMix, эфирная графика, звук на X32 и Dante, автоматизация через Companion. 30+ мероприятий с 2022 года.">
+<meta name="author" content="Андрей Варнавский">
+<link rel="canonical" href="https://xdshn.github.io/xDshN_Portfolio/">
+
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:site_name" content="Андрей Варнавский">
+<meta property="og:url" content="https://xdshn.github.io/xDshN_Portfolio/">
+<meta property="og:title" content="Андрей Варнавский - инженер прямого эфира">
+<meta property="og:description" content="Проектирую и веду технический контур мероприятий: видео, звук, графика, коммутация и автоматизация. 30+ проектов с 2022 года.">
+<meta property="og:image" content="https://xdshn.github.io/xDshN_Portfolio/assets/projects/majestic-control-room.webp">
+<meta property="og:image:width" content="2200">
+<meta property="og:image:height" content="1650">
+<meta property="og:image:alt" content="Андрей Варнавский за режиссёрским пультом студийной трансляции">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Андрей Варнавский - инженер прямого эфира">
+<meta name="twitter:description" content="vMix, эфирная графика, звук, автоматизация. 30+ мероприятий с 2022 года.">
+<meta name="twitter:image" content="https://xdshn.github.io/xDshN_Portfolio/assets/projects/majestic-control-room.webp">
+
+<link rel="icon" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="styles.css?v=d5ea02faee">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Андрей Варнавский",
+  "jobTitle": "Инженер прямого эфира и мультимедийных систем",
+  "url": "https://xdshn.github.io/xDshN_Portfolio/",
+  "address": { "@type": "PostalAddress", "addressLocality": "Москва", "addressCountry": "RU" },
+  "knowsAbout": ["vMix", "Эфирная графика", "Behringer X32", "Dante", "Bitfocus Companion", "Автоматизация мероприятий"],
+  "sameAs": ["https://t.me/xDshNNN", "https://vk.com/xdshnnn"]
+}
+</script>
+</head>
+<body>
+
+<div class="intro" id="intro" aria-hidden="true">
+  <span class="intro-sheet"></span>
+  <span class="intro-rule intro-rule-top"></span>
+  <span class="intro-rule intro-rule-bottom"></span>
+  <div class="intro-band">
+    <span class="intro-word">Эфир&nbsp;через</span>
+    <span class="intro-clock">00:03:00</span>
+    <i class="intro-tally"></i>
+  </div>
+  <span class="st st-body"></span>
+  <span class="st st-blade"></span>
+  <span class="st st-tail st-tail-a"></span>
+  <span class="st st-tail st-tail-b"></span>
+  <span class="intro-flash"></span>
+</div>
+
+<a class="skip-link" href="#main">К&nbsp;содержимому</a>
+
+<div class="air-progress" aria-hidden="true"></div>
+
+<div class="backdrop" aria-hidden="true">
+  <div class="grid-lines"></div>
+</div>
+
+<canvas id="holo" aria-hidden="true"></canvas>
+<canvas id="forms" aria-hidden="true"></canvas>
+<!-- дуга ленты, проходящая перед портретом -->
+<canvas id="forms-front" aria-hidden="true"></canvas>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="#top">
+      <span class="brand-mark" aria-hidden="true">АВ</span>
+      <span class="brand-text">
+        <strong>Андрей Варнавский</strong>
+        <span>Live systems</span>
+      </span>
+    </a>
+
+    <nav aria-label="Основная навигация">
+      <a href="#profile"><span>01</span>Профиль</a>
+      <a href="#contours"><span>02</span>Компетенции</a>
+      <a href="#graphics"><span>03</span>Графика</a>
+      <a href="#thesis"><span>04</span>Диплом</a>
+      <a href="#projects"><span>05</span>Проекты</a>
+    </nav>
+
+    <p class="timecode" aria-hidden="true"><i></i><b id="timecode">00:00:00:00</b></p>
+
+    <a class="availability" href="#contact"><i class="tally" aria-hidden="true"></i>На&nbsp;связи</a>
+
+    <button type="button" class="menu-toggle" id="menu-toggle"
+            aria-expanded="false" aria-controls="mobile-navigation" aria-label="Открыть меню">
+      <i aria-hidden="true"><span></span><span></span></i>Меню
+    </button>
+  </div>
+</header>
+
+<aside id="mobile-navigation" class="mobile-nav">
+  <nav aria-label="Мобильная навигация">
+    <a href="#profile"><span>01</span><strong>Профиль</strong><i aria-hidden="true">↗</i></a>
+    <a href="#contours"><span>02</span><strong>Компетенции</strong><i aria-hidden="true">↗</i></a>
+    <a href="#graphics"><span>03</span><strong>Графика</strong><i aria-hidden="true">↗</i></a>
+    <a href="#thesis"><span>04</span><strong>Диплом</strong><i aria-hidden="true">↗</i></a>
+    <a href="#projects"><span>05</span><strong>Проекты</strong><i aria-hidden="true">↗</i></a>
+  </nav>
+  <a class="mobile-cta" href="#contact">Обсудить проект <span aria-hidden="true">→</span></a>
+</aside>
+
+<main id="main">
+
+<!-- ============================ герой ============================ -->
+<section class="hero shell" id="top" data-cascade>
+  <div class="hero-inner">
+    <div>
+      <p class="hero-badge">Инженер прямого эфира</p>
+
+      <h1>Веду технический<br><em>контур события</em></h1>
+
+      <p class="hero-lead">Видео, звук, графика и&nbsp;автоматизация. От&nbsp;первой коммутации до&nbsp;последнего титра в&nbsp;эфире.</p>
+
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="#graphics">
+          Смотреть работы
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a class="btn btn-ghost" href="https://disk.yandex.ru/d/HsumsN8FVpaV2Q" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/></svg>
+          Полное портфолио
+        </a>
+      </div>
+
+      <div class="hero-socials">
+        <a href="https://t.me/xDshNNN" target="_blank" rel="noopener noreferrer" aria-label="Telegram">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.7 3.4 2.9 10.6c-1.1.4-1.1 1.1-.2 1.4l4.8 1.5 1.8 5.6c.2.6.4.8.8.8.4 0 .6-.2.9-.5l2.3-2.2 4.7 3.5c.9.5 1.5.2 1.7-.8l3.1-14.6c.3-1.2-.5-1.8-1.1-1.9Zm-3.8 3.9-8.7 7.9-.3 3.6-1.7-5.3 10-6.6c.4-.3.8-.1.7.4Z"/></svg>
+        </a>
+        <a href="https://vk.com/xdshnnn" target="_blank" rel="noopener noreferrer" aria-label="ВКонтакте">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.8 16.9c-5.2 0-8.4-3.6-8.5-9.5h2.6c.1 4.4 2.1 6.3 3.6 6.7V7.4h2.5v3.8c1.5-.2 3-1.8 3.5-3.8h2.4c-.4 2.4-2 4.1-3.1 4.8 1.1.6 2.9 2 3.6 4.7h-2.7c-.5-1.7-1.9-3-3.7-3.2v3.2h-.2Z"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <img class="hero-portrait" src="assets/profile/andrey-main-cutout.webp"
+           alt="Андрей Варнавский, инженер прямого эфира"
+           width="2000" height="1990" fetchpriority="high" decoding="async">
+
+      <span class="hero-floor" aria-hidden="true"></span>
+
+      <span class="frame-mark tl" aria-hidden="true"></span>
+      <span class="frame-mark br" aria-hidden="true"></span>
+
+      <p class="hero-chip hero-chip-live">On air</p>
+      <p class="hero-chip hero-chip-rate">Dante level 2</p>
+
+      <div class="hero-stats">
+        <div class="stat-card"><b data-count="4" data-suffix="+">4+</b><span>года в&nbsp;эфире</span></div>
+        <div class="stat-card"><b data-count="30" data-suffix="+">30+</b><span>мероприятий</span></div>
+        <div class="stat-card"><b data-count="2022" data-from="2000">2022</b><span>с&nbsp;начала пути</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ тикер ============================ -->
+<div class="ticker" aria-label="Ключевые технологии">
+  <div class="ticker-track">
+    <div class="ticker-group">
+      <span class="ticker-item"><img src="assets/brands/vmix.png" alt="" width="22" height="22" loading="lazy" decoding="async">vMix</span>
+      <span class="ticker-item"><i aria-hidden="true"></i>Live graphics</span>
+      <span class="ticker-item"><img src="assets/brands/gt-designer.png" alt="" width="22" height="22" loading="lazy" decoding="async">GT Title Designer</span>
+      <span class="ticker-item"><i aria-hidden="true"></i>Data-driven titles</span>
+      <span class="ticker-item"><img src="assets/brands/google-sheets.png" alt="" width="22" height="22" loading="lazy" decoding="async">Google Sheets</span>
+      <span class="ticker-item"><i aria-hidden="true"></i>Behringer X32</span>
+      <span class="ticker-item"><img src="assets/brands/dante-mark.png" alt="" width="22" height="22" loading="lazy" decoding="async">Dante Level 2</span>
+      <span class="ticker-item"><i aria-hidden="true"></i>Sound</span>
+      <span class="ticker-item"><img src="assets/brands/companion.png" alt="" width="22" height="22" loading="lazy" decoding="async">Bitfocus Companion</span>
+      <span class="ticker-item"><i aria-hidden="true"></i>MIDI · AutoHotkey · Python</span>
+    </div>
+    <div class="ticker-group" aria-hidden="true">
+      <span class="ticker-item"><img src="assets/brands/vmix.png" alt="" width="22" height="22" loading="lazy" decoding="async">vMix</span>
+      <span class="ticker-item"><i></i>Live graphics</span>
+      <span class="ticker-item"><img src="assets/brands/gt-designer.png" alt="" width="22" height="22" loading="lazy" decoding="async">GT Title Designer</span>
+      <span class="ticker-item"><i></i>Data-driven titles</span>
+      <span class="ticker-item"><img src="assets/brands/google-sheets.png" alt="" width="22" height="22" loading="lazy" decoding="async">Google Sheets</span>
+      <span class="ticker-item"><i></i>Behringer X32</span>
+      <span class="ticker-item"><img src="assets/brands/dante-mark.png" alt="" width="22" height="22" loading="lazy" decoding="async">Dante Level 2</span>
+      <span class="ticker-item"><i></i>Sound</span>
+      <span class="ticker-item"><img src="assets/brands/companion.png" alt="" width="22" height="22" loading="lazy" decoding="async">Bitfocus Companion</span>
+      <span class="ticker-item"><i></i>MIDI · AutoHotkey · Python</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============================ профиль ============================ -->
+<section class="section shell has-cloud" id="profile" data-cascade>
+  <div class="section-head reveal">
+    <h2>Не&nbsp;отдельная кнопка. Вся система.</h2>
+    <p class="lead">Понимаю, как&nbsp;взаимодействуют звук, видео, презентации, графика и&nbsp;оператор&nbsp;- и&nbsp;проектирую рабочую среду так, чтобы она держалась под&nbsp;нагрузкой живого события.</p>
+  </div>
+
+  <div class="profile-grid">
+    <div class="card profile-copy reveal">
+      <p>Четыре года собираю технический контур мероприятий: студенческие лиги и&nbsp;киберспорт, медицинские и&nbsp;деловые конференции, выездные эфиры и&nbsp;студийные трансляции. За&nbsp;это время накопилось больше тридцати проектов&nbsp;- от&nbsp;квиза на&nbsp;200 человек до&nbsp;чемпионата мира по&nbsp;футболу с&nbsp;Winline.</p>
+      <p>Работаю там, где нельзя переснять дубль: если титр вышел не&nbsp;тот или звук пропал на&nbsp;тридцатой минуте, второго шанса нет. Поэтому строю системы, которые прощают человеку ошибку и&nbsp;позволяют вернуть контроль за&nbsp;одно нажатие.</p>
+
+      <div class="profile-facts">
+        <div class="profile-fact">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></svg>
+          <div><small>Имя</small><strong>Андрей Варнавский</strong></div>
+        </div>
+        <div class="profile-fact">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg>
+          <div><small>Город</small><strong>Москва</strong></div>
+        </div>
+        <div class="profile-fact">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="9" r="5"/><path d="m8.5 13.2-1 7.3 4.5-2.5 4.5 2.5-1-7.3"/></svg>
+          <div><small>Сертификация</small><strong>Audinate Dante Level 2</strong></div>
+        </div>
+        <div class="profile-fact">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5.4l3.4 2"/></svg>
+          <div><small>Статус</small><strong class="live">Открыт к&nbsp;проектам</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-visual reveal">
+      <img src="assets/andrey-x32.webp" alt="Андрей за микшерным пультом Behringer X32"
+           width="1200" height="1600" loading="lazy" decoding="async">
+      <div class="profile-signals">
+        <span>Video</span><span>Sound</span><span>Graphics</span><span>Automation</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ компетенции ============================ -->
+<section class="section section-heavy shell has-cloud" id="contours" data-cascade>
+  <div class="section-head reveal">
+    <p class="section-index">Компетенции <i aria-hidden="true"></i></p>
+    <h2>Один проект&nbsp;- четыре связанных контура</h2>
+    <p class="lead">От&nbsp;сигнала на&nbsp;площадке до&nbsp;команды в&nbsp;эфире.</p>
+  </div>
+
+  <div class="contours">
+    <article class="contour contour-live reveal">
+      <span class="contour-accent" aria-hidden="true"></span>
+      <div class="contour-media">
+        <img src="assets/focus/live-control.webp" alt="Рабочее место режиссёра трансляции: мониторы с программой и превью" width="1200" height="750" loading="lazy" decoding="async">
+      </div>
+      <div>
+        <div class="contour-head"><span class="contour-num">01</span><h3>Прямой эфир</h3></div>
+        <p class="contour-meta">vMix · Zoom · Facecast</p>
+        <p style="margin-top:12px">Собираю проект в&nbsp;vMix: источники, сцены, переходы, запись, стрим и&nbsp;резервные сценарии на&nbsp;случай, когда что-то падает в&nbsp;середине эфира.</p>
+      </div>
+    </article>
+
+    <article class="contour contour-graphics reveal">
+      <span class="contour-accent" aria-hidden="true"></span>
+      <div class="contour-media">
+        <img src="assets/focus/graphics-editor.webp" alt="Редактор титров GT Title Designer с привязкой к источнику данных" width="1200" height="750" loading="lazy" decoding="async">
+      </div>
+      <div>
+        <div class="contour-head"><span class="contour-num">02</span><h3>Эфирная графика</h3></div>
+        <p class="contour-meta">GT · Data Source · Sheets</p>
+        <p style="margin-top:12px">Проектирую титры в&nbsp;GT Title Designer и&nbsp;связываю их с&nbsp;данными, триггерами и&nbsp;логикой события&nbsp;- состав участников меняется в&nbsp;таблице, а&nbsp;не в&nbsp;дизайне.</p>
+      </div>
+    </article>
+
+    <article class="contour contour-sound reveal">
+      <span class="contour-accent" aria-hidden="true"></span>
+      <canvas class="level-meter" data-meter="10" aria-hidden="true"></canvas>
+      <div>
+        <div class="contour-head"><span class="contour-num">03</span><h3>Звук</h3></div>
+        <p class="contour-meta">X32 · Dante Level 2</p>
+        <p style="margin-top:12px">Настраиваю тракт, маршрутизацию и&nbsp;микс отдельно для&nbsp;зала и&nbsp;для трансляции. Работаю на&nbsp;Behringer X32, сертифицирован Audinate Dante Level 2.</p>
+      </div>
+    </article>
+
+    <article class="contour contour-automation reveal">
+      <span class="contour-accent" aria-hidden="true"></span>
+      <div class="contour-media">
+        <img src="assets/focus/automation-companion.webp" alt="Панель Bitfocus Companion с назначенными макрокомандами" width="1200" height="750" loading="lazy" decoding="async">
+      </div>
+      <div>
+        <div class="contour-head"><span class="contour-num">04</span><h3>Автоматизация</h3></div>
+        <p class="contour-meta">Companion · Python · MIDI</p>
+        <p style="margin-top:12px">Убираю лишние ручные действия: Companion, горячие клавиши, MIDI-триггеры, скрипты и&nbsp;собственные утилиты под&nbsp;конкретную площадку.</p>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ============================ графика ============================ -->
+<section class="section section-heavy shell has-cloud" id="graphics" data-cascade>
+  <div class="section-head reveal">
+    <h2>Титр&nbsp;- это интерфейс эфира</h2>
+    <p class="lead">Графика, которую лучше увидеть в&nbsp;движении.</p>
+  </div>
+
+  <div class="studio">
+    <div class="studio-player">
+      <div class="case-player" id="case-player">
+        <video id="case-video" poster="assets/graphics/student-of-the-year-poster.webp"
+               preload="none" playsinline loop muted tabindex="-1"
+               aria-label="Видеодемонстрация проекта «Студент года»"></video>
+
+        <button type="button" class="case-player-start" id="case-start">
+          <span class="case-player-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M8 5.5v13l11-6.5-11-6.5Z" fill="currentColor"/></svg>
+          </span>
+          <span class="case-player-label">
+            <strong>Смотреть кейс</strong>
+            <small id="case-start-meta">Студент года · 01:37</small>
+          </span>
+        </button>
+
+        <div class="case-player-bar" aria-hidden="true">
+          <span>Data source · GT · vMix</span>
+          <b id="case-duration">01:37</b>
+        </div>
+      </div>
+    </div>
+
+    <div class="case-tabs" role="tablist" aria-label="Кейсы эфирной графики" id="case-tabs"></div>
+
+    <article class="case-copy" id="case-panel" role="tabpanel" tabindex="0">
+      <p class="label label-hot" id="case-index">Выбранный кейс 01</p>
+      <h3 id="case-title">Студент года</h3>
+      <p id="case-text"></p>
+      <div class="tag-row" id="case-tags"></div>
+    </article>
+  </div>
+</section>
+
+<!-- ============================ диплом ============================ -->
+<section class="section section-heavy shell has-cloud" id="thesis" data-cascade>
+  <div class="section-head reveal">
+    <h2>Автоматизация управления мультимедийным содержимым</h2>
+  </div>
+
+  <blockquote class="thesis-quote reveal">
+    «Использование информационных технологий для&nbsp;автоматизации управления мультимедийным
+    контентом на&nbsp;базе актового зала РГУ им. А. Н. Косыгина»
+  </blockquote>
+
+  <div class="tract-toolbar">
+    <span>Интерактивная схема системы</span>
+    <p>6 этапов · 24 иллюстрации. Выберите узел&nbsp;- ниже откроется этап.</p>
+  </div>
+
+  <div class="tract" id="tract" data-active="overview">
+    <svg class="tract-wires" viewBox="0 0 1200 520" aria-hidden="true">
+      <defs>
+        <linearGradient id="tractGradient" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#4ea7ff"/>
+          <stop offset="0.52" stop-color="#8a67ff"/>
+          <stop offset="1" stop-color="#e052ff"/>
+        </linearGradient>
+      </defs>
+      <g class="connector-lines">
+        <path id="flow-overview" data-flow="overview" d="M310 108 C390 108 405 210 470 235"/>
+        <path id="flow-sheets" data-flow="sheets" d="M300 382 C390 382 400 294 470 270"/>
+        <path id="flow-midi" data-flow="midi" d="M850 102 C790 102 765 190 735 230"/>
+        <path id="flow-audio" data-flow="audio" d="M988 140 C988 210 995 282 995 350"/>
+        <path id="flow-present" data-flow="present" d="M620 400 C620 360 620 335 620 314"/>
+        <path id="flow-vmix" data-flow="vmix" d="M735 260 C805 260 845 260 900 260"/>
+      </g>
+      <g class="diagram-signals">
+        <circle r="4" data-flow="overview"><animateMotion dur="4s" repeatCount="indefinite"><mpath href="#flow-overview"/></animateMotion></circle>
+        <circle r="4" data-flow="sheets"><animateMotion dur="3.4s" repeatCount="indefinite"><mpath href="#flow-sheets"/></animateMotion></circle>
+        <circle r="4" data-flow="midi"><animateMotion dur="3.7s" repeatCount="indefinite"><mpath href="#flow-midi"/></animateMotion></circle>
+        <circle r="4" data-flow="audio"><animateMotion dur="4.2s" repeatCount="indefinite"><mpath href="#flow-audio"/></animateMotion></circle>
+        <circle r="4" data-flow="present"><animateMotion dur="3.2s" repeatCount="indefinite"><mpath href="#flow-present"/></animateMotion></circle>
+        <circle r="4" data-flow="vmix"><animateMotion dur="2.8s" repeatCount="indefinite"><mpath href="#flow-vmix"/></animateMotion></circle>
+      </g>
+    </svg>
+
+    <div class="tract-nodes" role="tablist" aria-label="Этапы дипломного проекта" id="stage-tabs">
+      <div class="tract-out">
+        <div><small>Результат</small><strong>Экран + эфир</strong></div>
+        <span><i class="tally" aria-hidden="true"></i>Program out</span>
+      </div>
+    </div>
+  </div>
+  <p class="keyhint" aria-hidden="true">
+    <kbd>1</kbd><kbd>…</kbd><kbd>6</kbd> - этап,
+    <kbd>←</kbd><kbd>→</kbd> - по&nbsp;схеме
+  </p>
+
+  <article class="stage-panel" id="stage-panel" role="tabpanel" tabindex="0">
+    <div class="stage-nav" role="group" aria-label="Быстрый переход между этапами" id="stage-switch">
+      <span class="stage-switch-label">Этап</span>
+      <span class="stage-steps" id="stage-steps">
+        <button type="button" class="stage-step" id="stage-prev" aria-label="Предыдущий этап">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+        </button>
+        <button type="button" class="stage-step" id="stage-next" aria-label="Следующий этап">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+      </span>
+    </div>
+
+    <div class="stage-body">
+      <p class="label label-hot" id="stage-label"></p>
+      <h3 id="stage-title"></h3>
+      <p id="stage-intro"></p>
+      <div class="stage-points" id="stage-points"></div>
+      <div class="stage-effect">
+        <small>Практический эффект</small>
+        <strong id="stage-effect"></strong>
+      </div>
+    </div>
+
+    <div class="stage-shots">
+      <div class="stage-shots-head">
+        <p class="label label-hot" id="stage-shots-count"></p>
+        <p class="stage-shots-hint">Нажмите на&nbsp;изображение, чтобы рассмотреть интерфейс и&nbsp;подпись</p>
+      </div>
+      <div class="figure-grid" id="stage-figures"></div>
+    </div>
+  </article>
+</section>
+
+<!-- ============================ проекты ============================ -->
+<section class="section section-heavy shell has-cloud" id="projects" data-cascade>
+  <div class="section-head reveal">
+    <p class="section-index">Выбранные проекты <i aria-hidden="true"></i></p>
+    <h2>От&nbsp;режиссёрского стола до&nbsp;большого экрана</h2>
+    <p class="lead">Реальные площадки, реальные эфиры.</p>
+  </div>
+
+  <div class="project-filter" id="project-filter" aria-label="Фильтр проектов"></div>
+
+  <div class="multiview" id="multiview">
+    <article class="project-card reveal" data-group="Эфир">
+      <figure>
+        <img src="assets/winline-control.webp" alt="Winline × Medium Quality: чемпионат мира по футболу, режиссёрский стол" width="1200" height="675" loading="lazy" decoding="async">
+        <span class="project-src">SRC 01</span>
+      </figure>
+      <div class="project-info"><span>01</span><div><p>Коммерческая трансляция</p><h3>Winline × Medium Quality</h3><small>Чемпионат мира по&nbsp;футболу, режиссёрский стол</small></div></div>
+    </article>
+
+    <article class="project-card reveal" data-group="Эфир">
+      <figure>
+        <img src="assets/betboom-control.webp" alt="BetBoom: Будка 2025, контроль источников и программы" width="1200" height="675" loading="lazy" decoding="async">
+        <span class="project-src">SRC 02</span>
+      </figure>
+      <div class="project-info"><span>02</span><div><p>Выездной эфир</p><h3>BetBoom</h3><small>Будка 2025, контроль источников и&nbsp;программы</small></div></div>
+    </article>
+
+    <article class="project-card reveal" data-group="Форумы">
+      <figure>
+        <img src="assets/forum-etm.webp" alt="Форум ЭТМ: Сколково, трансляция и мультимедийный экран" width="1200" height="675" loading="lazy" decoding="async">
+        <span class="project-src">SRC 03</span>
+      </figure>
+      <div class="project-info"><span>03</span><div><p>Гибридное мероприятие</p><h3>Форум ЭТМ</h3><small>Сколково, трансляция и&nbsp;мультимедийный экран</small></div></div>
+    </article>
+
+    <article class="project-card reveal" data-group="Форумы">
+      <figure>
+        <img src="assets/mef-stage.webp" alt="Московский экономический форум: сцена, видео и презентационный контур" width="1200" height="675" loading="lazy" decoding="async">
+        <span class="project-src">SRC 04</span>
+      </figure>
+      <div class="project-info"><span>04</span><div><p>Техническое сопровождение</p><h3>Московский экономический форум</h3><small>Сцена, видео и&nbsp;презентационный контур</small></div></div>
+    </article>
+
+    <article class="project-card reveal" data-group="Форумы">
+      <figure>
+        <img src="assets/epic-stage.webp" alt="Epic Growth Conference: МГУ, экранное содержимое и эфирная среда" width="1200" height="675" loading="lazy" decoding="async">
+        <span class="project-src">SRC 05</span>
+      </figure>
+      <div class="project-info"><span>05</span><div><p>Мультимедийная площадка</p><h3>Epic Growth Conference</h3><small>МГУ, экранное содержимое и&nbsp;эфирная среда</small></div></div>
+    </article>
+
+    <article class="project-card reveal" data-group="Графика">
+      <figure>
+        <img src="assets/projects/student-of-the-year-graphic.webp" alt="Студент года: титры, результаты и экранная композиция" width="1200" height="675" loading="lazy" decoding="async">
+        <span class="project-src">SRC 06</span>
+      </figure>
+      <div class="project-info"><span>06</span><div><p>Эфирная графика</p><h3>Студент года</h3><small>Титры, результаты и&nbsp;экранная композиция</small></div></div>
+    </article>
+
+    <article class="project-card is-wide reveal" data-group="Эфир">
+      <figure>
+        <img src="assets/projects/majestic-control-room.webp" alt="Majestic: многокамерный эфир и технический контур студии" width="1200" height="675" loading="lazy" decoding="async">
+        <span class="project-src">SRC 07</span>
+      </figure>
+      <div class="project-info"><span>07</span><div><p>Студийная трансляция</p><h3>Majestic</h3><small>Многокамерный эфир и&nbsp;технический контур студии</small></div></div>
+    </article>
+
+    <a class="archive-tile reveal" href="https://disk.yandex.ru/d/HsumsN8FVpaV2Q" target="_blank" rel="noopener noreferrer">
+      <div>
+        <p>Полный архив</p>
+        <span class="archive-tile-count" data-count="32">32</span>
+        <strong>работы с&nbsp;2022 года</strong>
+      </div>
+      <span class="archive-tile-go">Смотреть на&nbsp;Яндекс Диске
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </span>
+    </a>
+  </div>
+</section>
+
+<!-- ============================ путь ============================ -->
+<section class="section shell has-cloud" id="path" data-cascade>
+  <div class="section-head reveal">
+    <h2>Через практику&nbsp;-<br>к&nbsp;системному подходу</h2>
+  </div>
+
+  <div class="timeline">
+    <div class="tl-item reveal">
+      <span class="tl-dot" aria-hidden="true"></span>
+      <p class="tl-year">2022</p>
+      <h3>Информационные технологии в&nbsp;медиаиндустрии</h3>
+      <p>Начало профессионального пути и&nbsp;первая работа с&nbsp;мультимедийными технологиями на&nbsp;студенческих мероприятиях.</p>
+    </div>
+    <div class="tl-item reveal">
+      <span class="tl-dot" aria-hidden="true"></span>
+      <p class="tl-year">2023</p>
+      <h3>Звук и&nbsp;мультимедийный экран</h3>
+      <p>Практика на&nbsp;площадках: от&nbsp;подготовки тракта до&nbsp;управления содержимым экрана в&nbsp;реальном времени.</p>
+    </div>
+    <div class="tl-item reveal">
+      <span class="tl-dot" aria-hidden="true"></span>
+      <p class="tl-year">2024-25</p>
+      <h3>Коммерческие и&nbsp;выездные проекты</h3>
+      <p>Офлайн, онлайн и&nbsp;гибридные форматы: PIR EXPO, Наука 0+, SANOFI, GPHG, IT Purple Conf, Киберзарница.</p>
+    </div>
+    <div class="tl-item reveal">
+      <span class="tl-dot" aria-hidden="true"></span>
+      <p class="tl-year">2026</p>
+      <h3>Диплом: автоматизация зала</h3>
+      <p>Сведение накопленного опыта в&nbsp;единую архитектуру управления мультимедийным содержимым.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ контакт ============================ -->
+<section class="section shell has-cloud" id="contact" data-cascade>
+  <div class="contact-card reveal">
+    <div>
+      <p class="label label-hot">Ready to connect</p>
+      <h2 style="margin-top:14px">Обсудим ваш проект?</h2>
+      <p>Могу подключиться к&nbsp;трансляции, мультимедийному проекту или задаче по&nbsp;автоматизации&nbsp;- от&nbsp;разовой площадки до&nbsp;постоянного технического сопровождения.</p>
+
+      <div class="contact-actions">
+        <a class="btn btn-primary" href="https://t.me/xDshNNN" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 3 10.5 13.5M21 3l-6.5 18-4-8-8-4L21 3Z"/></svg>
+          Написать в&nbsp;Telegram
+        </a>
+        <a class="btn btn-ghost" href="https://disk.yandex.ru/d/HsumsN8FVpaV2Q" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/></svg>
+          Полное портфолио
+        </a>
+      </div>
+    </div>
+
+    <div class="contact-list">
+      <a class="contact-row" href="https://t.me/xDshNNN" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.7 3.4 2.9 10.6c-1.1.4-1.1 1.1-.2 1.4l4.8 1.5 1.8 5.6c.2.6.4.8.8.8.4 0 .6-.2.9-.5l2.3-2.2 4.7 3.5c.9.5 1.5.2 1.7-.8l3.1-14.6c.3-1.2-.5-1.8-1.1-1.9Zm-3.8 3.9-8.7 7.9-.3 3.6-1.7-5.3 10-6.6c.4-.3.8-.1.7.4Z"/></svg>
+        <div><small>Telegram</small><strong>t.me/xDshNNN</strong></div>
+        <span class="go" aria-hidden="true">↗</span>
+      </a>
+
+      <a class="contact-row" href="https://vk.com/xdshnnn" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.8 16.9c-5.2 0-8.4-3.6-8.5-9.5h2.6c.1 4.4 2.1 6.3 3.6 6.7V7.4h2.5v3.8c1.5-.2 3-1.8 3.5-3.8h2.4c-.4 2.4-2 4.1-3.1 4.8 1.1.6 2.9 2 3.6 4.7h-2.7c-.5-1.7-1.9-3-3.7-3.2v3.2h-.2Z"/></svg>
+        <div><small>ВКонтакте</small><strong>vk.com/xdshnnn</strong></div>
+        <span class="go" aria-hidden="true">↗</span>
+      </a>
+
+      <a class="contact-row" href="https://disk.yandex.ru/d/HsumsN8FVpaV2Q" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/></svg>
+        <div><small>Архив работ</small><strong>30+ мероприятий на&nbsp;Яндекс Диске</strong></div>
+        <span class="go" aria-hidden="true">↗</span>
+      </a>
+
+      <div class="contact-row">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg>
+        <div><small>Город</small><strong>Москва и&nbsp;выезды</strong></div>
+      </div>
+
+      <div class="contact-row">
+        <i class="tally" aria-hidden="true" style="margin-inline:5px"></i>
+        <div><small>Статус</small><strong style="color:var(--tally-pre)">Открыт к&nbsp;новым проектам</strong></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="footer-inner shell">
+    <a class="brand" href="#top">
+      <span class="brand-mark" aria-hidden="true">АВ</span>
+      <span class="brand-text"><strong>Андрей Варнавский</strong><span>Broadcast engineer</span></span>
+    </a>
+    <nav class="footer-nav" aria-label="Навигация в подвале">
+      <a href="#profile">Профиль</a>
+      <a href="#contours">Компетенции</a>
+      <a href="#graphics">Графика</a>
+      <a href="#thesis">Диплом</a>
+      <a href="#projects">Проекты</a>
+      <a href="https://disk.yandex.ru/d/HsumsN8FVpaV2Q" target="_blank" rel="noopener noreferrer">Портфолио</a>
+    </nav>
+    <a class="to-top" href="#top">Наверх <span aria-hidden="true">↑</span></a>
+  </div>
+  <p class="footer-note shell" style="margin-top:18px">© 2026 Андрей Варнавский · Москва</p>
+</footer>
+
+<dialog class="figure-dialog" id="figure-dialog">
+  <div class="figure-dialog-inner">
+    <button type="button" class="figure-dialog-close" id="figure-close">Закрыть <span aria-hidden="true">✕</span></button>
+    <figure>
+      <img id="figure-img" src="" alt="" width="1600" height="900">
+      <figcaption>
+        <span class="figure-dialog-num" id="figure-num"></span>
+        <div><strong id="figure-title"></strong><p id="figure-text"></p></div>
+      </figcaption>
+    </figure>
+  </div>
+</dialog>
+
+<script src="holo.js?v=dd51bbdac5"></script>
+<script src="forms.js?v=4d26dedc5c"></script>
+<script src="motion.js?v=81eb1b5017"></script>
+<script src="app.js?v=600fafcebd"></script>
+</body>
+</html>

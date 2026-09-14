@@ -1,5 +1,7 @@
 name: Deploy portfolio to GitHub Pages
 
+# Сайт статический: собирать нечего, workflow только публикует файлы.
+
 on:
   push:
     branches: ["main"]
@@ -21,27 +23,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Detect the GitHub Pages base path
+      - name: Collect the site files
         shell: bash
         run: |
-          REPO_NAME="${GITHUB_REPOSITORY#*/}"
-          if [[ "$REPO_NAME" == *.github.io ]]; then
-            echo "NEXT_PUBLIC_BASE_PATH=" >> "$GITHUB_ENV"
-          else
-            echo "NEXT_PUBLIC_BASE_PATH=/$REPO_NAME" >> "$GITHUB_ENV"
-          fi
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build the static site
-        run: npm run build
+          mkdir -p _site
+          find . -mindepth 1 -maxdepth 1 \
+            ! -name .git ! -name .github ! -name _site ! -name README.md ! -name .gitignore \
+            -exec cp -a {} _site/ \;
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v6
@@ -49,7 +37,7 @@ jobs:
       - name: Upload the static site
         uses: actions/upload-pages-artifact@v5
         with:
-          path: ./out
+          path: ./_site
 
   deploy:
     environment:
